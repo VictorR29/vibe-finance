@@ -9,6 +9,7 @@ import { Settings } from './components/Settings';
 import { LayoutDashboard, Wallet, Bot, Sun, Moon, Target, Shield, Settings as SettingsIcon } from 'lucide-react';
 import { cn } from './utils/cn';
 import { Theme } from './types';
+import { ToastProvider } from './components/ui/Toast';
 
 type View = 'dashboard' | 'transactions' | 'savingsGoals' | 'budgets' | 'settings';
 
@@ -147,7 +148,9 @@ const MainApp: React.FC = () => {
 const App: React.FC = () => {
     return (
         <AppProvider>
-            <MainApp />
+            <ToastProvider>
+                <MainApp />
+            </ToastProvider>
         </AppProvider>
     );
 };

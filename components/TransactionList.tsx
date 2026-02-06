@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
+import { useToast } from './ui/Toast';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
@@ -11,6 +12,7 @@ import { Edit, Trash2, PlusCircle, Filter, Search, Calendar, X } from 'lucide-re
 
 export const TransactionList: React.FC = () => {
     const { state, deleteTransaction } = useAppContext();
+    const { showToast } = useToast();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
     const [filter, setFilter] = useState('');
@@ -23,6 +25,17 @@ export const TransactionList: React.FC = () => {
     const closeModal = () => {
         setEditingTransaction(null);
         setIsModalOpen(false);
+        showToast(
+            editingTransaction ? 'Transacción actualizada correctamente' : 'Transacción creada correctamente',
+            'success'
+        );
+    };
+
+    const handleDeleteTransaction = (transaction: Transaction) => {
+        if (window.confirm(`¿Estás seguro de eliminar "${transaction.description}"?`)) {
+            deleteTransaction(transaction.id);
+            showToast('Transacción eliminada correctamente', 'success');
+        }
     };
 
     const filteredTransactions = useMemo(() => {
@@ -92,25 +105,25 @@ export const TransactionList: React.FC = () => {
                 <div className="flow-root">
                     <ul role="list" className="divide-y divide-gray-100 dark:divide-white/5">
                         {filteredTransactions.length > 0 ? filteredTransactions.map((transaction) => (
-                            <li key={transaction.id} className="flex items-center justify-between py-4 group hover:bg-gray-50/50 dark:hover:bg-white/5 rounded-xl px-2 -mx-2 transition-colors">
-                                <div className="flex items-center space-x-4">
-                                    <div className={`p-3 rounded-2xl ${transaction.type === 'income' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400'}`}>
-                                        <div className="font-bold text-lg w-6 h-6 flex items-center justify-center">{transaction.category.charAt(0)}</div>
+                            <li key={transaction.id} className="flex items-center justify-between py-4 group hover:bg-gray-50/50 dark:hover:bg-white/5 rounded-xl px-2 -mx-2 transition-colors gap-3">
+                                <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
+                                    <div className={`p-2 sm:p-3 rounded-2xl flex-shrink-0 ${transaction.type === 'income' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400'}`}>
+                                        <div className="font-bold text-base sm:text-lg w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">{transaction.category.charAt(0)}</div>
                                     </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-900 dark:text-gray-100 truncate">{transaction.description}</p>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">{transaction.category} &middot; {formatShortDate(transaction.date)}</p>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm sm:text-base">{transaction.description}</p>
+                                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">{transaction.category} &middot; {formatShortDate(transaction.date)}</p>
                                     </div>
                                 </div>
-                                <div className="flex flex-col items-end gap-1">
-                                    <p className={`font-bold text-lg ${transaction.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>
+                                <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                                    <p className={`font-bold text-sm sm:text-base md:text-lg whitespace-nowrap ${transaction.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>
                                         {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount, state.currency)}
                                     </p>
-                                    <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity sm:opacity-100">
                                         <Button variant="ghost" size="sm" onClick={() => openModal(transaction)} className="p-1 h-auto text-gray-500 hover:text-primary">
                                             <Edit className="w-4 h-4" />
                                         </Button>
-                                        <Button variant="ghost" size="sm" onClick={() => deleteTransaction(transaction.id)} className="p-1 h-auto text-gray-500 hover:text-error">
+                                        <Button variant="ghost" size="sm" onClick={() => handleDeleteTransaction(transaction)} className="p-1 h-auto text-gray-500 hover:text-error">
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
                                     </div>
