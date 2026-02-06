@@ -72,7 +72,7 @@ const BudgetCard: React.FC<{ budget: Budget, spent: number, currency: string, on
 };
 
 
-export const Budgets: React.FC = () => {
+const Budgets: React.FC = () => {
     const { state, deleteBudget } = useAppContext();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
@@ -126,3 +126,5 @@ export const Budgets: React.FC = () => {
         </>
     );
 };
+
+export default Budgets;

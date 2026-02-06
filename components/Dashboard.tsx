@@ -32,7 +32,7 @@ const SavingsGoalProgress: React.FC<{ goal: SavingsGoal, currency: string }> = (
 };
 
 
-export const Dashboard: React.FC = () => {
+const Dashboard: React.FC = () => {
     const { state, setCurrency } = useAppContext();
     const [filterType, setFilterType] = useState<'monthly' | 'yearly'>('monthly');
     const [selectedPeriod, setSelectedPeriod] = useState<string>('');
@@ -302,3 +302,4 @@ export const Dashboard: React.FC = () => {
         </div>
     );
 };
+export default Dashboard;

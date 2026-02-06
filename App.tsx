@@ -1,20 +1,23 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { AppProvider, useAppContext } from './context/AppContext';
-import { Dashboard } from './components/Dashboard';
-import { TransactionList } from './components/TransactionList';
-import { SavingsGoals } from './components/SavingsGoals';
-import { Budgets } from './components/Budgets';
-import { Settings } from './components/Settings';
 import { LayoutDashboard, Wallet, Bot, Sun, Moon, Target, Shield, Settings as SettingsIcon } from 'lucide-react';
 import { cn } from './utils/cn';
 import { Theme } from './types';
 import { ToastProvider } from './components/ui/Toast';
+import { DashboardSkeleton, TransactionListSkeleton, BudgetsSkeleton, SavingsGoalsSkeleton, SettingsSkeleton } from './components/ui/Skeleton';
+
+// Lazy load components for better performance
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const TransactionList = lazy(() => import('./components/TransactionList'));
+const SavingsGoals = lazy(() => import('./components/SavingsGoals'));
+const Budgets = lazy(() => import('./components/Budgets'));
+const Settings = lazy(() => import('./components/Settings'));
 
 type View = 'dashboard' | 'transactions' | 'savingsGoals' | 'budgets' | 'settings';
 
 const MainApp: React.FC = () => {
-    const { state, setTheme } = useAppContext();
+    const { state, setTheme, isLoading } = useAppContext();
     const [activeView, setActiveView] = useState<View>('dashboard');
 
     useEffect(() => {
@@ -29,6 +32,17 @@ const MainApp: React.FC = () => {
     };
 
     const renderContent = () => {
+        if (isLoading) {
+            switch (activeView) {
+                case 'dashboard': return <DashboardSkeleton />;
+                case 'transactions': return <TransactionListSkeleton />;
+                case 'savingsGoals': return <SavingsGoalsSkeleton />;
+                case 'budgets': return <BudgetsSkeleton />;
+                case 'settings': return <SettingsSkeleton />;
+                default: return <DashboardSkeleton />;
+            }
+        }
+        
         switch (activeView) {
             case 'dashboard': return <Dashboard />;
             case 'transactions': return <TransactionList />;

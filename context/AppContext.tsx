@@ -55,6 +55,7 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
 interface AppContextType {
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
+  isLoading: boolean;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   updateTransaction: (transaction: Transaction) => void;
   deleteTransaction: (id: string) => void;
@@ -214,6 +215,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const contextValue = React.useMemo(() => ({
     state,
     dispatch,
+    isLoading: !isInitialized,
     addTransaction,
     updateTransaction,
     deleteTransaction,
@@ -230,6 +232,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setCurrency
   }), [
     state,
+    isInitialized,
     addTransaction,
     updateTransaction,
     deleteTransaction,
@@ -245,14 +248,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setTheme,
     setCurrency
   ]);
-
-  if (!isInitialized) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      );
-  }
 
   return (
     <AppContext.Provider value={contextValue}>

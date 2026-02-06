@@ -5,7 +5,7 @@ import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { Download, Upload, Trash2, Plus, AlertTriangle, CheckCircle, Tag, X } from 'lucide-react';
 
-export const Settings: React.FC = () => {
+const Settings: React.FC = () => {
     const { state, addCategory, deleteCategory, importData } = useAppContext();
     const [newCategory, setNewCategory] = useState('');
     const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -192,3 +192,5 @@ export const Settings: React.FC = () => {
         </div>
     );
 };
+
+export default Settings;

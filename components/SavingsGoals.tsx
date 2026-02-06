@@ -47,7 +47,7 @@ const SavingsGoalCard: React.FC<{ goal: SavingsGoal, currency: string, onEdit: (
     )
 }
 
-export const SavingsGoals: React.FC = () => {
+const SavingsGoals: React.FC = () => {
     const { state, deleteSavingsGoal } = useAppContext();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
@@ -94,3 +94,5 @@ export const SavingsGoals: React.FC = () => {
         </>
     );
 };
+
+export default SavingsGoals;

@@ -10,7 +10,7 @@ import { Transaction } from '../types';
 import { formatCurrency, formatShortDate } from '../utils/format';
 import { Edit, Trash2, PlusCircle, Filter, Search, Calendar, X } from 'lucide-react';
 
-export const TransactionList: React.FC = () => {
+const TransactionList: React.FC = () => {
     const { state, deleteTransaction } = useAppContext();
     const { showToast } = useToast();
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -155,3 +155,5 @@ export const TransactionList: React.FC = () => {
         </div>
     );
 };
+
+export default TransactionList;
