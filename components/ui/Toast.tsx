@@ -57,25 +57,25 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const getStyles = (type: ToastType) => {
     switch (type) {
       case 'success':
-        return 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800';
+        return 'bg-emerald-100 border-emerald-300 dark:bg-emerald-900/40 dark:border-emerald-700 shadow-emerald-500/20';
       case 'error':
-        return 'bg-rose-50 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800';
+        return 'bg-rose-100 border-rose-300 dark:bg-rose-900/40 dark:border-rose-700 shadow-rose-500/20';
       default:
-        return 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800';
+        return 'bg-blue-100 border-blue-300 dark:bg-blue-900/40 dark:border-blue-700 shadow-blue-500/20';
     }
   };
 
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      {/* Toast Container - Mobile: bottom center, Desktop: top right */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 sm:bottom-auto sm:translate-x-0 sm:top-4 sm:right-4 sm:left-auto z-[100] flex flex-col gap-2 pointer-events-none w-[calc(100%-2rem)] sm:w-auto">
+      {/* Toast Container - Mobile: above nav bar, Desktop: top right */}
+      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 sm:bottom-auto sm:translate-x-0 sm:top-4 sm:right-4 sm:left-auto z-[100] flex flex-col gap-2 pointer-events-none w-[calc(100%-2rem)] sm:w-auto max-w-[90vw] sm:max-w-[400px]">
         {toasts.map(toast => (
           <div
             key={toast.id}
             className={cn(
-              'pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border',
-              'w-full sm:min-w-[300px] sm:max-w-[400px]',
+              'pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border-2',
+              'w-full shadow-2xl backdrop-blur-sm',
               'transform transition-all duration-300 animate-in',
               'slide-in-from-bottom-full sm:slide-in-from-bottom-auto sm:slide-in-from-right-full',
               getStyles(toast.type)
