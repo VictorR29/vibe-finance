@@ -1,0 +1,5 @@
+{
+  "name": "Vibe Finance",
+  "description": "A personal finance management application with AI-powered insights and a helpful chatbot, built with React, Tailwind CSS, and the Gemini API.",
+  "requestFramePermissions": []
+}
