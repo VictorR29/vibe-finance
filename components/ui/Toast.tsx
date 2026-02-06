@@ -68,14 +68,16 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      {/* Toast Container */}
-      <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
+      {/* Toast Container - Mobile: bottom center, Desktop: top right */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 sm:bottom-auto sm:translate-x-0 sm:top-4 sm:right-4 sm:left-auto z-[100] flex flex-col gap-2 pointer-events-none w-[calc(100%-2rem)] sm:w-auto">
         {toasts.map(toast => (
           <div
             key={toast.id}
             className={cn(
-              'pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border min-w-[300px] max-w-[400px]',
-              'transform transition-all duration-300 animate-in slide-in-from-right-full',
+              'pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border',
+              'w-full sm:min-w-[300px] sm:max-w-[400px]',
+              'transform transition-all duration-300 animate-in',
+              'slide-in-from-bottom-full sm:slide-in-from-bottom-auto sm:slide-in-from-right-full',
               getStyles(toast.type)
             )}
           >
