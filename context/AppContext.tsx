@@ -93,13 +93,30 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case 'DELETE_CATEGORY':
       return { ...state, categories: state.categories.filter(c => c !== action.payload) };
     case 'LOAD_DATA':
-      // Migration: ensure accounts array exists and has at least one account
+      // Migration: ensure accounts array exists and calculate real balance
+      let migratedAccounts = action.payload.accounts;
+      if (!migratedAccounts || migratedAccounts.length === 0) {
+        // Calculate current balance from existing transactions
+        const transactions = action.payload.transactions || [];
+        const income = transactions
+          .filter((t: Transaction) => t.type === 'income')
+          .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
+        const expenses = transactions
+          .filter((t: Transaction) => t.type === 'expense')
+          .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
+        const currentBalance = income - expenses;
+
+        migratedAccounts = [
+          {
+            ...defaultAccount,
+            initialBalance: currentBalance,
+            currency: action.payload.currency || 'EUR',
+          },
+        ];
+      }
       const migratedState = {
         ...action.payload,
-        accounts:
-          action.payload.accounts && action.payload.accounts.length > 0
-            ? action.payload.accounts
-            : [defaultAccount],
+        accounts: migratedAccounts,
       };
       return migratedState;
     case 'SET_THEME':
@@ -155,9 +172,24 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
           if (!mergedState.categories || mergedState.categories.length === 0) {
             mergedState.categories = initialCategories;
           }
-          // Migration: ensure accounts array exists
+          // Migration: ensure accounts array exists with real balance
           if (!mergedState.accounts || mergedState.accounts.length === 0) {
-            mergedState.accounts = [defaultAccount];
+            const transactions = mergedState.transactions || [];
+            const income = transactions
+              .filter((t: Transaction) => t.type === 'income')
+              .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
+            const expenses = transactions
+              .filter((t: Transaction) => t.type === 'expense')
+              .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
+            const currentBalance = income - expenses;
+
+            mergedState.accounts = [
+              {
+                ...defaultAccount,
+                initialBalance: currentBalance,
+                currency: mergedState.currency || 'EUR',
+              },
+            ];
           }
           dispatch({ type: 'LOAD_DATA', payload: mergedState });
         }

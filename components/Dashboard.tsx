@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Card, CardStat } from './ui/Card';
+import { Modal } from './ui/Modal';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { formatCurrency, formatMonthYear } from '../utils/format';
 import {
@@ -11,6 +12,8 @@ import {
   Globe,
   Calendar,
   PiggyBank,
+  Eye,
+  X,
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { SavingsGoal } from '../types';
@@ -46,8 +49,24 @@ const Dashboard: React.FC = () => {
   const { state, setCurrency } = useAppContext();
   const [filterType, setFilterType] = useState<'monthly' | 'yearly'>('monthly');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('');
+  const [showAccountsModal, setShowAccountsModal] = useState(false);
 
   const isDarkMode = state.theme === 'dark';
+
+  // Calculate balance for each account
+  const accountBalances = useMemo(() => {
+    return state.accounts.map(account => {
+      const transactions = state.transactions.filter(t => t.accountId === account.id);
+      const income = transactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+      const expense = transactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+      const balance = account.initialBalance + income - expense;
+      return { ...account, balance };
+    });
+  }, [state.accounts, state.transactions]);
 
   // 1. Calculate available periods based on transactions + current date
   const availablePeriods = useMemo(() => {
@@ -187,12 +206,17 @@ const Dashboard: React.FC = () => {
           icon={<ArrowDownLeft className="w-6 h-6" />}
           color="bg-rose-500"
         />
-        <CardStat
-          label="Balance Global"
-          value={formatCurrency(globalStats.balance, state.currency)}
-          icon={<Wallet className="w-6 h-6" />}
-          color="bg-primary"
-        />
+        <div
+          onClick={() => setShowAccountsModal(true)}
+          className="cursor-pointer hover:opacity-90 transition-opacity"
+        >
+          <CardStat
+            label="Balance Global (Ver desglose)"
+            value={formatCurrency(globalStats.balance, state.currency)}
+            icon={<Wallet className="w-6 h-6" />}
+            color="bg-primary"
+          />
+        </div>
       </div>
 
       {/* Period Analysis Section */}
@@ -384,6 +408,61 @@ const Dashboard: React.FC = () => {
           </div>
         </Card>
       </div>
+
+      {/* Accounts Breakdown Modal */}
+      <Modal
+        isOpen={showAccountsModal}
+        onClose={() => setShowAccountsModal(false)}
+        title="Desglose por Cuentas"
+        size="md"
+      >
+        <div className="space-y-4">
+          {accountBalances.map(account => (
+            <div
+              key={account.id}
+              className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl"
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: account.color || '#6366f1' }}
+                />
+                <div>
+                  <p className="font-semibold text-gray-900 dark:text-white">{account.name}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Balance inicial: {formatCurrency(account.initialBalance, account.currency)}
+                  </p>
+                </div>
+              </div>
+              <p
+                className={`text-lg font-bold ${
+                  account.balance >= 0
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-rose-600 dark:text-rose-400'
+                }`}
+              >
+                {formatCurrency(account.balance, account.currency)}
+              </p>
+            </div>
+          ))}
+
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+            <div className="flex justify-between items-center">
+              <span className="text-lg font-bold text-gray-900 dark:text-white">TOTAL GLOBAL</span>
+              <span className="text-xl font-bold text-primary">
+                {formatCurrency(globalStats.balance, state.currency)}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-4">
+            <Button onClick={() => setShowAccountsModal(false)}>
+              <X className="w-4 h-4 mr-2" />
+              Cerrar
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

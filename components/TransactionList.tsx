@@ -7,7 +7,16 @@ import { Modal } from './ui/Modal';
 import { TransactionForm } from './TransactionForm';
 import { Transaction } from '../types';
 import { formatCurrency, formatShortDate } from '../utils/format';
-import { Edit, Trash2, PlusCircle, Filter, Search, Calendar, X } from 'lucide-react';
+import {
+  Edit,
+  Trash2,
+  PlusCircle,
+  Filter,
+  Search,
+  Calendar,
+  X,
+  ArrowRightLeft,
+} from 'lucide-react';
 
 const TransactionList: React.FC = () => {
   const { state, deleteTransaction } = useAppContext();
@@ -17,7 +26,7 @@ const TransactionList: React.FC = () => {
   const [filter, setFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [typeFilter, setTypeFilter] = useState<'all' | 'income' | 'expense'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'income' | 'expense' | 'transfer'>('all');
   const [accountFilter, setAccountFilter] = useState<string>('all');
 
   const openModal = (transaction?: Transaction) => {
@@ -169,6 +178,16 @@ const TransactionList: React.FC = () => {
               >
                 Gastos
               </button>
+              <button
+                onClick={() => setTypeFilter('transfer')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  typeFilter === 'transfer'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
+              >
+                Transferencias
+              </button>
             </div>
           </div>
 
@@ -248,63 +267,108 @@ const TransactionList: React.FC = () => {
         <div className="flow-root">
           <ul role="list" className="divide-y divide-gray-100 dark:divide-white/5">
             {filteredTransactions.length > 0 ? (
-              filteredTransactions.map(transaction => (
-                <li
-                  key={transaction.id}
-                  className="flex items-center justify-between py-4 group hover:bg-gray-50/50 dark:hover:bg-white/5 rounded-xl px-2 -mx-2 transition-colors gap-3"
-                >
-                  <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
-                    <div
-                      className={`p-2 sm:p-3 rounded-2xl flex-shrink-0 ${transaction.type === 'income' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400'}`}
-                    >
-                      <div className="font-bold text-base sm:text-lg w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">
-                        {transaction.category.charAt(0)}
+              filteredTransactions.map(transaction => {
+                const isTransfer = transaction.type === 'transfer';
+                const fromAccount = state.accounts.find(a => a.id === transaction.accountId);
+                const toAccount = state.accounts.find(a => a.id === transaction.toAccountId);
+
+                return (
+                  <li
+                    key={transaction.id}
+                    className={`flex items-center justify-between py-4 group rounded-xl px-2 -mx-2 transition-colors gap-3 ${
+                      isTransfer
+                        ? 'bg-blue-50/70 dark:bg-blue-900/20 border-l-4 border-blue-500 hover:bg-blue-100/70 dark:hover:bg-blue-900/30'
+                        : 'hover:bg-gray-50/50 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
+                      {isTransfer ? (
+                        <div className="p-2 sm:p-3 rounded-2xl flex-shrink-0 bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                          <ArrowRightLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                        </div>
+                      ) : (
+                        <div
+                          className={`p-2 sm:p-3 rounded-2xl flex-shrink-0 ${transaction.type === 'income' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400'}`}
+                        >
+                          <div className="font-bold text-base sm:text-lg w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">
+                            {transaction.category.charAt(0)}
+                          </div>
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm sm:text-base">
+                          {isTransfer
+                            ? `Transferencia: ${fromAccount?.name || 'Cuenta'} → ${toAccount?.name || 'Cuenta'}`
+                            : transaction.description}
+                        </p>
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
+                          {isTransfer ? (
+                            <>
+                              {formatShortDate(transaction.date)}
+                              {transaction.description &&
+                                transaction.description !== 'Transferencia entre cuentas' && (
+                                  <span className="ml-1">&middot; {transaction.description}</span>
+                                )}
+                            </>
+                          ) : (
+                            <>
+                              {transaction.category} &middot; {formatShortDate(transaction.date)}
+                              {transaction.accountId && (
+                                <span className="ml-1">
+                                  &middot;{' '}
+                                  {state.accounts.find(a => a.id === transaction.accountId)?.name ||
+                                    'Cuenta eliminada'}
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </p>
                       </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm sm:text-base">
-                        {transaction.description}
-                      </p>
-                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
-                        {transaction.category} &middot; {formatShortDate(transaction.date)}
-                        {transaction.accountId && (
-                          <span className="ml-1">
-                            &middot;{' '}
-                            {state.accounts.find(a => a.id === transaction.accountId)?.name ||
-                              'Cuenta eliminada'}
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                      <p
+                        className={`font-bold text-sm sm:text-base md:text-lg whitespace-nowrap ${
+                          isTransfer
+                            ? 'text-blue-600 dark:text-blue-400'
+                            : transaction.type === 'income'
+                              ? 'text-emerald-600 dark:text-emerald-400'
+                              : 'text-gray-900 dark:text-white'
+                        }`}
+                      >
+                        {isTransfer ? (
+                          <span className="flex items-center gap-1">
+                            <ArrowRightLeft className="w-4 h-4" />
+                            {formatCurrency(transaction.amount, state.currency)}
                           </span>
+                        ) : (
+                          <>
+                            {transaction.type === 'income' ? '+' : '-'}
+                            {formatCurrency(transaction.amount, state.currency)}
+                          </>
                         )}
                       </p>
+                      <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity sm:opacity-100">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openModal(transaction)}
+                          className="p-1 h-auto text-gray-500 hover:text-primary"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteTransaction(transaction)}
+                          className="p-1 h-auto text-gray-500 hover:text-error"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                    <p
-                      className={`font-bold text-sm sm:text-base md:text-lg whitespace-nowrap ${transaction.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}
-                    >
-                      {transaction.type === 'income' ? '+' : '-'}
-                      {formatCurrency(transaction.amount, state.currency)}
-                    </p>
-                    <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity sm:opacity-100">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => openModal(transaction)}
-                        className="p-1 h-auto text-gray-500 hover:text-primary"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteTransaction(transaction)}
-                        className="p-1 h-auto text-gray-500 hover:text-error"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </li>
-              ))
+                  </li>
+                );
+              })
             ) : (
               <div className="text-center py-20">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
