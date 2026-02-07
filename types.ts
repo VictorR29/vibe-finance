@@ -4,11 +4,25 @@ export interface Transaction {
   category: string;
   description: string;
   date: string;
-  type: 'income' | 'expense';
+  type: 'income' | 'expense' | 'transfer';
+  accountId: string;
+  toAccountId?: string; // For transfers
   tags?: string[];
   location?: string;
   notes?: string;
   isRecurring?: boolean;
+}
+
+export interface Account {
+  id: string;
+  name: string;
+  type: 'cash' | 'checking' | 'savings' | 'credit' | 'investment' | 'other';
+  currency: string;
+  initialBalance: number;
+  color?: string;
+  icon?: string;
+  isActive: boolean;
+  createdAt: string;
 }
 
 export interface SavingsGoal {
@@ -37,6 +51,7 @@ export interface ChatMessage {
 
 export interface AppState {
   transactions: Transaction[];
+  accounts: Account[];
   savingsGoals: SavingsGoal[];
   budgets: Budget[];
   categories: string[];
@@ -48,6 +63,9 @@ export type AppAction =
   | { type: 'ADD_TRANSACTION'; payload: Transaction }
   | { type: 'UPDATE_TRANSACTION'; payload: Transaction }
   | { type: 'DELETE_TRANSACTION'; payload: string }
+  | { type: 'ADD_ACCOUNT'; payload: Account }
+  | { type: 'UPDATE_ACCOUNT'; payload: Account }
+  | { type: 'DELETE_ACCOUNT'; payload: string }
   | { type: 'ADD_SAVINGS_GOAL'; payload: SavingsGoal }
   | { type: 'UPDATE_SAVINGS_GOAL'; payload: SavingsGoal }
   | { type: 'DELETE_SAVINGS_GOAL'; payload: string }

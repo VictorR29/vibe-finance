@@ -8,7 +8,7 @@ import React, {
   useCallback,
   useRef,
 } from 'react';
-import { AppState, AppAction, Transaction, SavingsGoal, Budget, Theme } from '../types';
+import { AppState, AppAction, Transaction, SavingsGoal, Budget, Theme, Account } from '../types';
 import { loadStateFromDB, saveStateToDB } from '../utils/db';
 import { generateId } from '../utils/idGenerator';
 
@@ -24,8 +24,20 @@ const initialCategories = [
   'Otros',
 ];
 
+const defaultAccount: Account = {
+  id: 'default',
+  name: 'Cuenta Principal',
+  type: 'checking',
+  currency: 'EUR',
+  initialBalance: 0,
+  color: '#6366f1',
+  isActive: true,
+  createdAt: new Date().toISOString(),
+};
+
 const initialState: AppState = {
   transactions: [],
+  accounts: [defaultAccount],
   savingsGoals: [],
   budgets: [],
   categories: initialCategories,
@@ -46,6 +58,15 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       };
     case 'DELETE_TRANSACTION':
       return { ...state, transactions: state.transactions.filter(t => t.id !== action.payload) };
+    case 'ADD_ACCOUNT':
+      return { ...state, accounts: [...state.accounts, action.payload] };
+    case 'UPDATE_ACCOUNT':
+      return {
+        ...state,
+        accounts: state.accounts.map(a => (a.id === action.payload.id ? action.payload : a)),
+      };
+    case 'DELETE_ACCOUNT':
+      return { ...state, accounts: state.accounts.filter(a => a.id !== action.payload) };
     case 'ADD_SAVINGS_GOAL':
       return { ...state, savingsGoals: [...state.savingsGoals, action.payload] };
     case 'UPDATE_SAVINGS_GOAL':
@@ -72,7 +93,15 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case 'DELETE_CATEGORY':
       return { ...state, categories: state.categories.filter(c => c !== action.payload) };
     case 'LOAD_DATA':
-      return action.payload;
+      // Migration: ensure accounts array exists and has at least one account
+      const migratedState = {
+        ...action.payload,
+        accounts:
+          action.payload.accounts && action.payload.accounts.length > 0
+            ? action.payload.accounts
+            : [defaultAccount],
+      };
+      return migratedState;
     case 'SET_THEME':
       return { ...state, theme: action.payload };
     case 'SET_CURRENCY':
@@ -89,6 +118,9 @@ interface AppContextType {
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   updateTransaction: (transaction: Transaction) => void;
   deleteTransaction: (id: string) => void;
+  addAccount: (account: Omit<Account, 'id'>) => void;
+  updateAccount: (account: Account) => void;
+  deleteAccount: (id: string) => void;
   addSavingsGoal: (goal: Omit<SavingsGoal, 'id'>) => void;
   updateSavingsGoal: (goal: SavingsGoal) => void;
   deleteSavingsGoal: (id: string) => void;
@@ -122,6 +154,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
           const mergedState = { ...initialState, ...storedState };
           if (!mergedState.categories || mergedState.categories.length === 0) {
             mergedState.categories = initialCategories;
+          }
+          // Migration: ensure accounts array exists
+          if (!mergedState.accounts || mergedState.accounts.length === 0) {
+            mergedState.accounts = [defaultAccount];
           }
           dispatch({ type: 'LOAD_DATA', payload: mergedState });
         }
@@ -169,21 +205,39 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     dispatch({ type: 'DELETE_TRANSACTION', payload: id });
   }, []);
 
-  const addSavingsGoal = useCallback((goal: Omit<SavingsGoal, 'id'>) => {
-    const newGoal = { ...goal, id: generateId() };
-    dispatch({ type: 'ADD_SAVINGS_GOAL', payload: newGoal });
-
-    if (goal.currentAmount > 0) {
-      const transaction: Omit<Transaction, 'id'> = {
-        amount: goal.currentAmount,
-        category: 'Meta de Ahorro',
-        description: `Inicio de meta: ${goal.name}`,
-        date: new Date().toISOString().split('T')[0],
-        type: 'expense',
-      };
-      dispatch({ type: 'ADD_TRANSACTION', payload: { ...transaction, id: generateId() } });
-    }
+  const addAccount = useCallback((account: Omit<Account, 'id'>) => {
+    dispatch({ type: 'ADD_ACCOUNT', payload: { ...account, id: generateId() } });
   }, []);
+
+  const updateAccount = useCallback((account: Account) => {
+    dispatch({ type: 'UPDATE_ACCOUNT', payload: account });
+  }, []);
+
+  const deleteAccount = useCallback((id: string) => {
+    dispatch({ type: 'DELETE_ACCOUNT', payload: id });
+  }, []);
+
+  const addSavingsGoal = useCallback(
+    (goal: Omit<SavingsGoal, 'id'>) => {
+      const newGoal = { ...goal, id: generateId() };
+      dispatch({ type: 'ADD_SAVINGS_GOAL', payload: newGoal });
+
+      if (goal.currentAmount > 0) {
+        // Get the default account or the first active account
+        const defaultAcc = state.accounts.find(a => a.isActive) || state.accounts[0];
+        const transaction: Omit<Transaction, 'id'> = {
+          amount: goal.currentAmount,
+          category: 'Meta de Ahorro',
+          description: `Inicio de meta: ${goal.name}`,
+          date: new Date().toISOString().split('T')[0],
+          type: 'expense',
+          accountId: defaultAcc?.id || 'default',
+        };
+        dispatch({ type: 'ADD_TRANSACTION', payload: { ...transaction, id: generateId() } });
+      }
+    },
+    [state.accounts]
+  );
 
   const updateSavingsGoal = useCallback(
     (goal: SavingsGoal) => {
@@ -192,12 +246,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       if (originalGoal) {
         const contributionAmount = goal.currentAmount - originalGoal.currentAmount;
         if (contributionAmount > 0) {
+          // Get the default account or the first active account
+          const defaultAcc = state.accounts.find(a => a.isActive) || state.accounts[0];
           const transaction: Omit<Transaction, 'id'> = {
             amount: contributionAmount,
             category: 'Meta de Ahorro',
             description: `Aporte a meta: ${goal.name}`,
             date: new Date().toISOString().split('T')[0],
             type: 'expense',
+            accountId: defaultAcc?.id || 'default',
           };
           dispatch({ type: 'ADD_TRANSACTION', payload: { ...transaction, id: generateId() } });
         }
@@ -206,7 +263,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       // Then update the goal
       dispatch({ type: 'UPDATE_SAVINGS_GOAL', payload: goal });
     },
-    [state.savingsGoals]
+    [state.savingsGoals, state.accounts]
   );
 
   const deleteSavingsGoal = useCallback((id: string) => {
@@ -253,6 +310,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       addTransaction,
       updateTransaction,
       deleteTransaction,
+      addAccount,
+      updateAccount,
+      deleteAccount,
       addSavingsGoal,
       updateSavingsGoal,
       deleteSavingsGoal,
@@ -271,6 +331,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       addTransaction,
       updateTransaction,
       deleteTransaction,
+      addAccount,
+      updateAccount,
+      deleteAccount,
       addSavingsGoal,
       updateSavingsGoal,
       deleteSavingsGoal,
