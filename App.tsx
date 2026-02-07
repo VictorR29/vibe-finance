@@ -9,6 +9,7 @@ import {
   Target,
   Shield,
   Settings as SettingsIcon,
+  TrendingUp,
 } from 'lucide-react';
 import { cn } from './utils/cn';
 import { Theme } from './types';
@@ -21,14 +22,35 @@ import {
   SettingsSkeleton,
 } from './components/ui/Skeleton';
 
+// Create a simple Trends skeleton
+const TrendsSkeleton: React.FC = () => (
+  <div className="space-y-6 pb-20 md:pb-0">
+    <div className="flex justify-between items-center">
+      <div className="h-10 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+      <div className="flex gap-2">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        ))}
+      </div>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {[1, 2, 3].map(i => (
+        <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+      ))}
+    </div>
+    <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+  </div>
+);
+
 // Lazy load components for better performance
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const TransactionList = lazy(() => import('./components/TransactionList'));
 const SavingsGoals = lazy(() => import('./components/SavingsGoals'));
 const Budgets = lazy(() => import('./components/Budgets'));
 const Settings = lazy(() => import('./components/Settings'));
+const Trends = lazy(() => import('./components/Trends'));
 
-type View = 'dashboard' | 'transactions' | 'savingsGoals' | 'budgets' | 'settings';
+type View = 'dashboard' | 'transactions' | 'savingsGoals' | 'budgets' | 'trends' | 'settings';
 
 const MainApp: React.FC = () => {
   const { state, setTheme, isLoading } = useAppContext();
@@ -56,6 +78,8 @@ const MainApp: React.FC = () => {
           return <SavingsGoalsSkeleton />;
         case 'budgets':
           return <BudgetsSkeleton />;
+        case 'trends':
+          return <TrendsSkeleton />;
         case 'settings':
           return <SettingsSkeleton />;
         default:
@@ -72,6 +96,8 @@ const MainApp: React.FC = () => {
         return <SavingsGoals />;
       case 'budgets':
         return <Budgets />;
+      case 'trends':
+        return <Trends />;
       case 'settings':
         return <Settings />;
       default:
@@ -144,6 +170,7 @@ const MainApp: React.FC = () => {
             <NavItem view="transactions" icon={<Wallet />} label="Transacciones" />
             <NavItem view="savingsGoals" icon={<Target />} label="Metas" />
             <NavItem view="budgets" icon={<Shield />} label="Presupuestos" />
+            <NavItem view="trends" icon={<TrendingUp />} label="Tendencias" />
 
             <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">
               Sistema
@@ -195,10 +222,10 @@ const MainApp: React.FC = () => {
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 pb-safe">
           <div className="flex justify-around items-center h-16 px-2">
             <NavItem view="dashboard" icon={<LayoutDashboard />} label="Inicio" mobile />
-            <NavItem view="transactions" icon={<Wallet />} label="Transac." mobile />
+            <NavItem view="transactions" icon={<Wallet />} label="Transacc." mobile />
             <NavItem view="savingsGoals" icon={<Target />} label="Metas" mobile />
             <NavItem view="budgets" icon={<Shield />} label="Presup." mobile />
-            <NavItem view="settings" icon={<SettingsIcon />} label="Ajustes" mobile />
+            <NavItem view="trends" icon={<TrendingUp />} label="Tendencias" mobile />
           </div>
         </nav>
       </main>
