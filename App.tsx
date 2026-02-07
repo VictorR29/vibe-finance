@@ -10,6 +10,7 @@ import {
   Shield,
   Settings as SettingsIcon,
   TrendingUp,
+  Landmark,
 } from 'lucide-react';
 import { cn } from './utils/cn';
 import { Theme } from './types';
@@ -47,10 +48,18 @@ const Dashboard = lazy(() => import('./components/Dashboard'));
 const TransactionList = lazy(() => import('./components/TransactionList'));
 const SavingsGoals = lazy(() => import('./components/SavingsGoals'));
 const Budgets = lazy(() => import('./components/Budgets'));
+const Accounts = lazy(() => import('./components/Accounts'));
 const Settings = lazy(() => import('./components/Settings'));
 const Trends = lazy(() => import('./components/Trends'));
 
-type View = 'dashboard' | 'transactions' | 'savingsGoals' | 'budgets' | 'trends' | 'settings';
+type View =
+  | 'dashboard'
+  | 'transactions'
+  | 'savingsGoals'
+  | 'budgets'
+  | 'accounts'
+  | 'trends'
+  | 'settings';
 
 const MainApp: React.FC = () => {
   const { state, setTheme, isLoading } = useAppContext();
@@ -78,6 +87,8 @@ const MainApp: React.FC = () => {
           return <SavingsGoalsSkeleton />;
         case 'budgets':
           return <BudgetsSkeleton />;
+        case 'accounts':
+          return <BudgetsSkeleton />;
         case 'trends':
           return <TrendsSkeleton />;
         case 'settings':
@@ -96,6 +107,8 @@ const MainApp: React.FC = () => {
         return <SavingsGoals />;
       case 'budgets':
         return <Budgets />;
+      case 'accounts':
+        return <Accounts />;
       case 'trends':
         return <Trends />;
       case 'settings':
@@ -170,6 +183,7 @@ const MainApp: React.FC = () => {
             <NavItem view="transactions" icon={<Wallet />} label="Transacciones" />
             <NavItem view="savingsGoals" icon={<Target />} label="Metas" />
             <NavItem view="budgets" icon={<Shield />} label="Presupuestos" />
+            <NavItem view="accounts" icon={<Landmark />} label="Cuentas" />
             <NavItem view="trends" icon={<TrendingUp />} label="Tendencias" />
 
             <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">
@@ -225,6 +239,7 @@ const MainApp: React.FC = () => {
             <NavItem view="transactions" icon={<Wallet />} label="Transacc." mobile />
             <NavItem view="savingsGoals" icon={<Target />} label="Metas" mobile />
             <NavItem view="budgets" icon={<Shield />} label="Presup." mobile />
+            <NavItem view="accounts" icon={<Landmark />} label="Cuentas" mobile />
             <NavItem view="trends" icon={<TrendingUp />} label="Tendencias" mobile />
           </div>
         </nav>

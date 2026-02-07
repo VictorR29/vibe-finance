@@ -11,12 +11,17 @@ interface TransactionFormProps {
 
 export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, initialData }) => {
   const { state, addTransaction, updateTransaction } = useAppContext();
+
+  // Get default account (first active one)
+  const defaultAccount = state.accounts.find(a => a.isActive)?.id || state.accounts[0]?.id || '';
+
   const [formData, setFormData] = useState({
     amount: '',
     category: '',
     description: '',
     date: new Date().toISOString().split('T')[0],
-    type: 'expense' as 'income' | 'expense',
+    type: 'expense' as 'income' | 'expense' | 'transfer',
+    accountId: defaultAccount,
     tags: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -29,6 +34,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
         description: initialData.description,
         date: initialData.date,
         type: initialData.type,
+        accountId: initialData.accountId,
         tags: initialData.tags?.join(', ') || '',
       });
     }
@@ -42,6 +48,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
     if (!formData.category.trim()) newErrors.category = 'La categoría es obligatoria';
     if (!formData.description.trim()) newErrors.description = 'La descripción es obligatoria';
     if (!formData.date) newErrors.date = 'La fecha es obligatoria';
+    if (!formData.accountId) newErrors.accountId = 'Debes seleccionar una cuenta';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -56,6 +63,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
       description: formData.description.trim(),
       date: formData.date,
       type: formData.type,
+      accountId: formData.accountId,
       tags: formData.tags
         .split(',')
         .map(tag => tag.trim())
@@ -69,6 +77,8 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
     }
     onSubmit();
   };
+
+  const activeAccounts = state.accounts.filter(a => a.isActive);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -91,6 +101,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
           required
         />
       </div>
+
       <FormField
         label="Descripción"
         type="text"
@@ -100,6 +111,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
         placeholder="Ej: Café con amigos"
         required
       />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           label="Categoría"
@@ -121,6 +133,20 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
           ]}
         />
       </div>
+
+      <FormField
+        label="Cuenta"
+        type="select"
+        value={formData.accountId}
+        onChange={value => setFormData({ ...formData, accountId: value })}
+        error={errors.accountId}
+        options={activeAccounts.map(acc => ({
+          value: acc.id,
+          label: acc.name,
+        }))}
+        required
+      />
+
       <FormField
         label="Etiquetas (separadas por coma)"
         type="text"
@@ -128,6 +154,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
         onChange={value => setFormData({ ...formData, tags: value })}
         placeholder="Ej: trabajo, personal"
       />
+
       <div className="flex justify-end pt-4">
         <Button type="submit" size="lg">
           {initialData ? 'Actualizar' : 'Añadir'} Transacción
