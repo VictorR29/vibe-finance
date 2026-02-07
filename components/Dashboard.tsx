@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Card, CardStat } from './ui/Card';
 import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { formatCurrency, formatMonthYear } from '../utils/format';
 import {
@@ -12,7 +13,6 @@ import {
   Globe,
   Calendar,
   PiggyBank,
-  Eye,
   X,
 } from 'lucide-react';
 import { cn } from '../utils/cn';

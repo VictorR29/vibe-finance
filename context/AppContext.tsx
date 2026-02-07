@@ -92,7 +92,7 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       return { ...state, categories: [...state.categories, action.payload] };
     case 'DELETE_CATEGORY':
       return { ...state, categories: state.categories.filter(c => c !== action.payload) };
-    case 'LOAD_DATA':
+    case 'LOAD_DATA': {
       // Migration: ensure accounts array exists and calculate real balance
       let migratedAccounts = action.payload.accounts;
       if (!migratedAccounts || migratedAccounts.length === 0) {
@@ -119,6 +119,7 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         accounts: migratedAccounts,
       };
       return migratedState;
+    }
     case 'SET_THEME':
       return { ...state, theme: action.payload };
     case 'SET_CURRENCY':
