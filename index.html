@@ -1,15 +1,20 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/icon-192x192.svg" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#6366f1" />
-    <meta name="description" content="Gestiona tus finanzas personales de forma inteligente y segura con Vibe Finanzas" />
+    <meta
+      name="description"
+      content="Gestiona tus finanzas personales de forma inteligente y segura con Vibe Finanzas"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Vibe Finanzas" />
@@ -23,26 +28,26 @@
         theme: {
           extend: {
             colors: {
-              primary: { 'DEFAULT': '#6366f1', 'hover': '#4f46e5' }, // Indigo moderno
-              success: { 'DEFAULT': '#10B981', 'hover': '#059669' },
-              warning: { 'DEFAULT': '#F59E0B', 'hover': '#D97706' },
-              error:   { 'DEFAULT': '#EF4444', 'hover': '#DC2626' },
+              primary: { DEFAULT: '#6366f1', hover: '#4f46e5' }, // Indigo moderno
+              success: { DEFAULT: '#10B981', hover: '#059669' },
+              warning: { DEFAULT: '#F59E0B', hover: '#D97706' },
+              error: { DEFAULT: '#EF4444', hover: '#DC2626' },
               glass: {
                 light: 'rgba(255, 255, 255, 0.7)',
                 dark: 'rgba(17, 24, 39, 0.6)',
-                border: 'rgba(255, 255, 255, 0.2)'
-              }
+                border: 'rgba(255, 255, 255, 0.2)',
+              },
             },
             fontFamily: {
               sans: ['Inter', 'system-ui', 'sans-serif'],
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      };
     </script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-      
+
       body {
         font-family: 'Inter', sans-serif;
       }
@@ -66,9 +71,15 @@
       }
 
       @keyframes gradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
       }
 
       /* Custom Scrollbar */
@@ -77,41 +88,43 @@
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: transparent; 
+        background: transparent;
       }
       ::-webkit-scrollbar-thumb {
-        background: rgba(156, 163, 175, 0.5); 
+        background: rgba(156, 163, 175, 0.5);
         border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: rgba(156, 163, 175, 0.8); 
+        background: rgba(156, 163, 175, 0.8);
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.552.0",
-    "recharts": "https://aistudiocdn.com/recharts@^3.3.0",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
-  <body class="text-gray-800 dark:text-gray-100 antialiased selection:bg-primary selection:text-white">
+    <script type="importmap">
+      {
+        "imports": {
+          "lucide-react": "https://aistudiocdn.com/lucide-react@^0.552.0",
+          "recharts": "https://aistudiocdn.com/recharts@^3.3.0",
+          "react/": "https://aistudiocdn.com/react@^19.2.0/",
+          "react": "https://aistudiocdn.com/react@^19.2.0",
+          "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+        }
+      }
+    </script>
+  </head>
+  <body
+    class="text-gray-800 dark:text-gray-100 antialiased selection:bg-primary selection:text-white"
+  >
     <div class="blob-bg"></div>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
+          navigator.serviceWorker
+            .register('/sw.js')
+            .then(registration => {
               console.log('SW registered:', registration);
             })
-            .catch((error) => {
+            .catch(error => {
               console.log('SW registration failed:', error);
             });
         });
