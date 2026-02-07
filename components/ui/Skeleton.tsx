@@ -6,14 +6,7 @@ interface SkeletonProps {
 }
 
 export const Skeleton: React.FC<SkeletonProps> = ({ className }) => {
-  return (
-    <div
-      className={cn(
-        'animate-pulse bg-gray-200 dark:bg-gray-700 rounded',
-        className
-      )}
-    />
-  );
+  return <div className={cn('animate-pulse bg-gray-200 dark:bg-gray-700 rounded', className)} />;
 };
 
 // Skeleton para tarjetas de estadísticas
@@ -61,13 +54,13 @@ export const TransactionListSkeleton: React.FC = () => {
         <Skeleton className="h-10 w-48" />
         <Skeleton className="h-10 w-40" />
       </div>
-      
+
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-xl p-6">
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <Skeleton className="h-12 w-full flex-1" />
           <Skeleton className="h-12 w-full md:w-48" />
         </div>
-        
+
         <div className="divide-y divide-gray-100 dark:divide-white/5">
           {Array.from({ length: 5 }).map((_, i) => (
             <TransactionItemSkeleton key={i} />
@@ -127,7 +120,7 @@ export const BudgetsSkeleton: React.FC = () => {
         <Skeleton className="h-10 w-48" />
         <Skeleton className="h-10 w-40" />
       </div>
-      
+
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-xl p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -160,7 +153,7 @@ export const SavingsGoalsSkeleton: React.FC = () => {
         <Skeleton className="h-10 w-40" />
         <Skeleton className="h-10 w-32" />
       </div>
-      
+
       <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-xl p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -187,7 +180,7 @@ export const SettingsSkeleton: React.FC = () => {
   return (
     <div className="space-y-6 pb-20 md:pb-0">
       <Skeleton className="h-10 w-40" />
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-xl p-6 space-y-4">
           <Skeleton className="h-6 w-32" />
@@ -195,7 +188,7 @@ export const SettingsSkeleton: React.FC = () => {
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-12 w-full" />
         </div>
-        
+
         <div className="bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-xl p-6 space-y-4">
           <Skeleton className="h-6 w-40" />
           <Skeleton className="h-4 w-full" />

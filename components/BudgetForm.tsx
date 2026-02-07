@@ -47,7 +47,7 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({ onSubmit, initialData })
       limit: Number(formData.limit),
       period: formData.period,
     };
-    
+
     if (initialData) {
       updateBudget({ ...budgetData, id: initialData.id });
     } else {
@@ -59,26 +59,32 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({ onSubmit, initialData })
   const availableCategories = state.categories.filter(
     cat => !state.budgets.some(b => b.category === cat && b.id !== initialData?.id)
   );
-  
+
   if (initialData?.category && !availableCategories.includes(initialData.category)) {
-      availableCategories.unshift(initialData.category);
+    availableCategories.unshift(initialData.category);
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-        <FormField
-          label="Categoría" type="select" value={formData.category}
-          onChange={(value) => setFormData({ ...formData, category: value })}
-          error={errors.category}
-          options={availableCategories.map(cat => ({ value: cat, label: cat }))}
-          required
-          disabled={!!initialData}
-        />
-        <FormField
-          label="Límite Mensual" type="number" value={formData.limit}
-          onChange={(value) => setFormData({ ...formData, limit: value })}
-          error={errors.limit} placeholder="500" required
-        />
+      <FormField
+        label="Categoría"
+        type="select"
+        value={formData.category}
+        onChange={value => setFormData({ ...formData, category: value })}
+        error={errors.category}
+        options={availableCategories.map(cat => ({ value: cat, label: cat }))}
+        required
+        disabled={!!initialData}
+      />
+      <FormField
+        label="Límite Mensual"
+        type="number"
+        value={formData.limit}
+        onChange={value => setFormData({ ...formData, limit: value })}
+        error={errors.limit}
+        placeholder="500"
+        required
+      />
       <div className="flex justify-end pt-4">
         <Button type="submit" size="lg">
           {initialData ? 'Actualizar' : 'Crear'} Presupuesto

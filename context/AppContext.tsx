@@ -1,10 +1,27 @@
-import React, { createContext, useContext, useReducer, ReactNode, useEffect, useState, useCallback, useRef } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  ReactNode,
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+} from 'react';
 import { AppState, AppAction, Transaction, SavingsGoal, Budget, Theme } from '../types';
 import { loadStateFromDB, saveStateToDB } from '../utils/db';
 import { generateId } from '../utils/idGenerator';
 
 const initialCategories = [
-    'Comida', 'Transporte', 'Vivienda', 'Ocio', 'Salud', 'Educación', 'Salario', 'Meta de Ahorro', 'Otros'
+  'Comida',
+  'Transporte',
+  'Vivienda',
+  'Ocio',
+  'Salud',
+  'Educación',
+  'Salario',
+  'Meta de Ahorro',
+  'Otros',
 ];
 
 const initialState: AppState = {
@@ -21,26 +38,39 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case 'ADD_TRANSACTION':
       return { ...state, transactions: [...state.transactions, action.payload] };
     case 'UPDATE_TRANSACTION':
-      return { ...state, transactions: state.transactions.map(t => t.id === action.payload.id ? action.payload : t) };
+      return {
+        ...state,
+        transactions: state.transactions.map(t =>
+          t.id === action.payload.id ? action.payload : t
+        ),
+      };
     case 'DELETE_TRANSACTION':
       return { ...state, transactions: state.transactions.filter(t => t.id !== action.payload) };
     case 'ADD_SAVINGS_GOAL':
-        return { ...state, savingsGoals: [...state.savingsGoals, action.payload] };
+      return { ...state, savingsGoals: [...state.savingsGoals, action.payload] };
     case 'UPDATE_SAVINGS_GOAL':
-        return { ...state, savingsGoals: state.savingsGoals.map(g => g.id === action.payload.id ? action.payload : g) };
+      return {
+        ...state,
+        savingsGoals: state.savingsGoals.map(g =>
+          g.id === action.payload.id ? action.payload : g
+        ),
+      };
     case 'DELETE_SAVINGS_GOAL':
-        return { ...state, savingsGoals: state.savingsGoals.filter(g => g.id !== action.payload) };
+      return { ...state, savingsGoals: state.savingsGoals.filter(g => g.id !== action.payload) };
     case 'ADD_BUDGET':
-        return { ...state, budgets: [...state.budgets, action.payload] };
+      return { ...state, budgets: [...state.budgets, action.payload] };
     case 'UPDATE_BUDGET':
-        return { ...state, budgets: state.budgets.map(b => b.id === action.payload.id ? action.payload : b) };
+      return {
+        ...state,
+        budgets: state.budgets.map(b => (b.id === action.payload.id ? action.payload : b)),
+      };
     case 'DELETE_BUDGET':
-        return { ...state, budgets: state.budgets.filter(b => b.id !== action.payload) };
+      return { ...state, budgets: state.budgets.filter(b => b.id !== action.payload) };
     case 'ADD_CATEGORY':
-        if (state.categories.includes(action.payload)) return state;
-        return { ...state, categories: [...state.categories, action.payload] };
+      if (state.categories.includes(action.payload)) return state;
+      return { ...state, categories: [...state.categories, action.payload] };
     case 'DELETE_CATEGORY':
-        return { ...state, categories: state.categories.filter(c => c !== action.payload) };
+      return { ...state, categories: state.categories.filter(c => c !== action.payload) };
     case 'LOAD_DATA':
       return action.payload;
     case 'SET_THEME':
@@ -86,20 +116,20 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // Load data from IndexedDB on mount
   useEffect(() => {
     const initData = async () => {
-        try {
-            const storedState = await loadStateFromDB();
-            if (storedState) {
-                const mergedState = { ...initialState, ...storedState };
-                if (!mergedState.categories || mergedState.categories.length === 0) {
-                    mergedState.categories = initialCategories;
-                }
-                dispatch({ type: 'LOAD_DATA', payload: mergedState });
-            }
-        } catch (error) {
-            console.error('Error loading initial data:', error);
-        } finally {
-            setIsInitialized(true);
+      try {
+        const storedState = await loadStateFromDB();
+        if (storedState) {
+          const mergedState = { ...initialState, ...storedState };
+          if (!mergedState.categories || mergedState.categories.length === 0) {
+            mergedState.categories = initialCategories;
+          }
+          dispatch({ type: 'LOAD_DATA', payload: mergedState });
         }
+      } catch (error) {
+        console.error('Error loading initial data:', error);
+      } finally {
+        setIsInitialized(true);
+      }
     };
     initData();
   }, []);
@@ -126,7 +156,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       }
     };
   }, [state, isInitialized]);
-  
+
   const addTransaction = useCallback((transaction: Omit<Transaction, 'id'>) => {
     dispatch({ type: 'ADD_TRANSACTION', payload: { ...transaction, id: generateId() } });
   }, []);
@@ -144,37 +174,40 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     dispatch({ type: 'ADD_SAVINGS_GOAL', payload: newGoal });
 
     if (goal.currentAmount > 0) {
-        const transaction: Omit<Transaction, 'id'> = {
-            amount: goal.currentAmount,
-            category: 'Meta de Ahorro',
-            description: `Inicio de meta: ${goal.name}`,
-            date: new Date().toISOString().split('T')[0],
-            type: 'expense'
-        };
-        dispatch({ type: 'ADD_TRANSACTION', payload: { ...transaction, id: generateId() } });
+      const transaction: Omit<Transaction, 'id'> = {
+        amount: goal.currentAmount,
+        category: 'Meta de Ahorro',
+        description: `Inicio de meta: ${goal.name}`,
+        date: new Date().toISOString().split('T')[0],
+        type: 'expense',
+      };
+      dispatch({ type: 'ADD_TRANSACTION', payload: { ...transaction, id: generateId() } });
     }
   }, []);
 
-  const updateSavingsGoal = useCallback((goal: SavingsGoal) => {
-    // Handle contribution transaction first (before updating the goal)
-    const originalGoal = state.savingsGoals.find(g => g.id === goal.id);
-    if (originalGoal) {
+  const updateSavingsGoal = useCallback(
+    (goal: SavingsGoal) => {
+      // Handle contribution transaction first (before updating the goal)
+      const originalGoal = state.savingsGoals.find(g => g.id === goal.id);
+      if (originalGoal) {
         const contributionAmount = goal.currentAmount - originalGoal.currentAmount;
         if (contributionAmount > 0) {
-            const transaction: Omit<Transaction, 'id'> = {
-                amount: contributionAmount,
-                category: 'Meta de Ahorro',
-                description: `Aporte a meta: ${goal.name}`,
-                date: new Date().toISOString().split('T')[0],
-                type: 'expense'
-            };
-            dispatch({ type: 'ADD_TRANSACTION', payload: { ...transaction, id: generateId() } });
+          const transaction: Omit<Transaction, 'id'> = {
+            amount: contributionAmount,
+            category: 'Meta de Ahorro',
+            description: `Aporte a meta: ${goal.name}`,
+            date: new Date().toISOString().split('T')[0],
+            type: 'expense',
+          };
+          dispatch({ type: 'ADD_TRANSACTION', payload: { ...transaction, id: generateId() } });
         }
-    }
-    
-    // Then update the goal
-    dispatch({ type: 'UPDATE_SAVINGS_GOAL', payload: goal });
-  }, [state.savingsGoals]);
+      }
+
+      // Then update the goal
+      dispatch({ type: 'UPDATE_SAVINGS_GOAL', payload: goal });
+    },
+    [state.savingsGoals]
+  );
 
   const deleteSavingsGoal = useCallback((id: string) => {
     dispatch({ type: 'DELETE_SAVINGS_GOAL', payload: id });
@@ -193,17 +226,17 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }, []);
 
   const addCategory = useCallback((category: string) => {
-      dispatch({ type: 'ADD_CATEGORY', payload: category });
+    dispatch({ type: 'ADD_CATEGORY', payload: category });
   }, []);
 
   const deleteCategory = useCallback((category: string) => {
-      dispatch({ type: 'DELETE_CATEGORY', payload: category });
+    dispatch({ type: 'DELETE_CATEGORY', payload: category });
   }, []);
 
   const importData = useCallback((data: AppState) => {
-      dispatch({ type: 'LOAD_DATA', payload: data });
+    dispatch({ type: 'LOAD_DATA', payload: data });
   }, []);
-  
+
   const setTheme = useCallback((theme: Theme) => {
     dispatch({ type: 'SET_THEME', payload: theme });
   }, []);
@@ -212,48 +245,47 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     dispatch({ type: 'SET_CURRENCY', payload: currency });
   }, []);
 
-  const contextValue = React.useMemo(() => ({
-    state,
-    dispatch,
-    isLoading: !isInitialized,
-    addTransaction,
-    updateTransaction,
-    deleteTransaction,
-    addSavingsGoal,
-    updateSavingsGoal,
-    deleteSavingsGoal,
-    addBudget,
-    updateBudget,
-    deleteBudget,
-    addCategory,
-    deleteCategory,
-    importData,
-    setTheme,
-    setCurrency
-  }), [
-    state,
-    isInitialized,
-    addTransaction,
-    updateTransaction,
-    deleteTransaction,
-    addSavingsGoal,
-    updateSavingsGoal,
-    deleteSavingsGoal,
-    addBudget,
-    updateBudget,
-    deleteBudget,
-    addCategory,
-    deleteCategory,
-    importData,
-    setTheme,
-    setCurrency
-  ]);
-
-  return (
-    <AppContext.Provider value={contextValue}>
-      {children}
-    </AppContext.Provider>
+  const contextValue = React.useMemo(
+    () => ({
+      state,
+      dispatch,
+      isLoading: !isInitialized,
+      addTransaction,
+      updateTransaction,
+      deleteTransaction,
+      addSavingsGoal,
+      updateSavingsGoal,
+      deleteSavingsGoal,
+      addBudget,
+      updateBudget,
+      deleteBudget,
+      addCategory,
+      deleteCategory,
+      importData,
+      setTheme,
+      setCurrency,
+    }),
+    [
+      state,
+      isInitialized,
+      addTransaction,
+      updateTransaction,
+      deleteTransaction,
+      addSavingsGoal,
+      updateSavingsGoal,
+      deleteSavingsGoal,
+      addBudget,
+      updateBudget,
+      deleteBudget,
+      addCategory,
+      deleteCategory,
+      importData,
+      setTheme,
+      setCurrency,
+    ]
   );
+
+  return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
 };
 
 export const useAppContext = () => {

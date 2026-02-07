@@ -56,13 +56,16 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
       description: formData.description.trim(),
       date: formData.date,
       type: formData.type,
-      tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+      tags: formData.tags
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(Boolean),
     };
-    
+
     if (initialData) {
-        updateTransaction({ ...transactionData, id: initialData.id });
+      updateTransaction({ ...transactionData, id: initialData.id });
     } else {
-        addTransaction(transactionData);
+      addTransaction(transactionData);
     }
     onSubmit();
   };
@@ -71,41 +74,58 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
-          label="Cantidad" type="number" value={formData.amount}
-          onChange={(value) => setFormData({ ...formData, amount: value })}
-          error={errors.amount} placeholder="0.00" required
+          label="Cantidad"
+          type="number"
+          value={formData.amount}
+          onChange={value => setFormData({ ...formData, amount: value })}
+          error={errors.amount}
+          placeholder="0.00"
+          required
         />
         <FormField
-          label="Fecha" type="date" value={formData.date}
-          onChange={(value) => setFormData({ ...formData, date: value })}
-          error={errors.date} required
+          label="Fecha"
+          type="date"
+          value={formData.date}
+          onChange={value => setFormData({ ...formData, date: value })}
+          error={errors.date}
+          required
         />
       </div>
       <FormField
-        label="Descripción" type="text" value={formData.description}
-        onChange={(value) => setFormData({ ...formData, description: value })}
-        error={errors.description} placeholder="Ej: Café con amigos" required
+        label="Descripción"
+        type="text"
+        value={formData.description}
+        onChange={value => setFormData({ ...formData, description: value })}
+        error={errors.description}
+        placeholder="Ej: Café con amigos"
+        required
       />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
-          label="Categoría" type="select" value={formData.category}
-          onChange={(value) => setFormData({ ...formData, category: value })}
+          label="Categoría"
+          type="select"
+          value={formData.category}
+          onChange={value => setFormData({ ...formData, category: value })}
           error={errors.category}
           options={state.categories.map(cat => ({ value: cat, label: cat }))}
           required
         />
         <FormField
-          label="Tipo" type="select" value={formData.type}
-          onChange={(value) => setFormData({ ...formData, type: value as 'income' | 'expense' })}
+          label="Tipo"
+          type="select"
+          value={formData.type}
+          onChange={value => setFormData({ ...formData, type: value as 'income' | 'expense' })}
           options={[
             { value: 'expense', label: 'Gasto' },
-            { value: 'income', label: 'Ingreso' }
+            { value: 'income', label: 'Ingreso' },
           ]}
         />
       </div>
       <FormField
-        label="Etiquetas (separadas por coma)" type="text" value={formData.tags}
-        onChange={(value) => setFormData({ ...formData, tags: value })}
+        label="Etiquetas (separadas por coma)"
+        type="text"
+        value={formData.tags}
+        onChange={value => setFormData({ ...formData, tags: value })}
         placeholder="Ej: trabajo, personal"
       />
       <div className="flex justify-end pt-4">

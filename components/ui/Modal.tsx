@@ -10,13 +10,7 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-export const Modal: React.FC<ModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  title, 
-  children, 
-  size = 'md' 
-}) => {
+export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, size = 'md' }) => {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -41,24 +35,26 @@ export const Modal: React.FC<ModalProps> = ({
     sm: 'max-w-md',
     md: 'max-w-lg',
     lg: 'max-w-2xl',
-    xl: 'max-w-4xl'
+    xl: 'max-w-4xl',
   };
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-screen items-center justify-center p-4 text-center">
         {/* Backdrop */}
-        <div 
+        <div
           className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
           aria-hidden="true"
           onClick={onClose}
         />
-        
+
         {/* Modal Content */}
-        <div className={cn(
-          'relative w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-2xl transform transition-all text-left animate-in fade-in zoom-in-95 duration-200',
-          sizeClasses[size]
-        )}>
+        <div
+          className={cn(
+            'relative w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-2xl transform transition-all text-left animate-in fade-in zoom-in-95 duration-200',
+            sizeClasses[size]
+          )}
+        >
           {title && (
             <div className="flex items-center justify-between p-6 border-b border-gray-200/50 dark:border-gray-700/50">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h3>
@@ -70,9 +66,7 @@ export const Modal: React.FC<ModalProps> = ({
               </button>
             </div>
           )}
-          <div className="p-6">
-            {children}
-          </div>
+          <div className="p-6">{children}</div>
         </div>
       </div>
     </div>

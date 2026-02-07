@@ -35,10 +35,14 @@ export const SavingsGoalForm: React.FC<SavingsGoalFormProps> = ({ onSubmit, init
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) newErrors.name = 'El nombre es obligatorio';
-    if (!formData.targetAmount || isNaN(Number(formData.targetAmount)) || Number(formData.targetAmount) <= 0) {
+    if (
+      !formData.targetAmount ||
+      isNaN(Number(formData.targetAmount)) ||
+      Number(formData.targetAmount) <= 0
+    ) {
       newErrors.targetAmount = 'El objetivo debe ser un número mayor que 0';
     }
-     if (isNaN(Number(formData.currentAmount)) || Number(formData.currentAmount) < 0) {
+    if (isNaN(Number(formData.currentAmount)) || Number(formData.currentAmount) < 0) {
       newErrors.currentAmount = 'La cantidad actual debe ser un número positivo';
     }
     if (!formData.targetDate) newErrors.targetDate = 'La fecha objetivo es obligatoria';
@@ -57,47 +61,65 @@ export const SavingsGoalForm: React.FC<SavingsGoalFormProps> = ({ onSubmit, init
       targetDate: formData.targetDate,
       priority: formData.priority,
     };
-    
+
     if (initialData) {
-        updateSavingsGoal({ ...goalData, id: initialData.id });
+      updateSavingsGoal({ ...goalData, id: initialData.id });
     } else {
-        addSavingsGoal(goalData);
+      addSavingsGoal(goalData);
     }
     onSubmit();
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-        <FormField
-          label="Nombre de la Meta" type="text" value={formData.name}
-          onChange={(value) => setFormData({ ...formData, name: value })}
-          error={errors.name} placeholder="Ej: Viaje a Japón" required
-        />
+      <FormField
+        label="Nombre de la Meta"
+        type="text"
+        value={formData.name}
+        onChange={value => setFormData({ ...formData, name: value })}
+        error={errors.name}
+        placeholder="Ej: Viaje a Japón"
+        required
+      />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
-          label="Cantidad Objetivo" type="number" value={formData.targetAmount}
-          onChange={(value) => setFormData({ ...formData, targetAmount: value })}
-          error={errors.targetAmount} placeholder="1000" required
+          label="Cantidad Objetivo"
+          type="number"
+          value={formData.targetAmount}
+          onChange={value => setFormData({ ...formData, targetAmount: value })}
+          error={errors.targetAmount}
+          placeholder="1000"
+          required
         />
         <FormField
-          label="Cantidad Actual" type="number" value={formData.currentAmount}
-          onChange={(value) => setFormData({ ...formData, currentAmount: value })}
-          error={errors.currentAmount} placeholder="0"
+          label="Cantidad Actual"
+          type="number"
+          value={formData.currentAmount}
+          onChange={value => setFormData({ ...formData, currentAmount: value })}
+          error={errors.currentAmount}
+          placeholder="0"
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-         <FormField
-          label="Fecha Objetivo" type="date" value={formData.targetDate}
-          onChange={(value) => setFormData({ ...formData, targetDate: value })}
-          error={errors.targetDate} required
+        <FormField
+          label="Fecha Objetivo"
+          type="date"
+          value={formData.targetDate}
+          onChange={value => setFormData({ ...formData, targetDate: value })}
+          error={errors.targetDate}
+          required
         />
         <FormField
-          label="Prioridad" type="select" value={formData.priority}
-          onChange={(value) => setFormData({ ...formData, priority: value as 'high' | 'medium' | 'low' })}
+          label="Prioridad"
+          type="select"
+          value={formData.priority}
+          onChange={value =>
+            setFormData({ ...formData, priority: value as 'high' | 'medium' | 'low' })
+          }
           options={[
             { value: 'low', label: 'Baja' },
             { value: 'medium', label: 'Media' },
-            { value: 'high', label: 'Alta' }
+            { value: 'high', label: 'Alta' },
           ]}
         />
       </div>
