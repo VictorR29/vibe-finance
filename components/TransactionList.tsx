@@ -18,6 +18,7 @@ const TransactionList: React.FC = () => {
   const [dateFilter, setDateFilter] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [typeFilter, setTypeFilter] = useState<'all' | 'income' | 'expense'>('all');
+  const [accountFilter, setAccountFilter] = useState<string>('all');
 
   const openModal = (transaction?: Transaction) => {
     setEditingTransaction(transaction || null);
@@ -52,14 +53,18 @@ const TransactionList: React.FC = () => {
         const matchesCategories =
           selectedCategories.length === 0 || selectedCategories.includes(t.category);
         const matchesType = typeFilter === 'all' || t.type === typeFilter;
+        const matchesAccount = accountFilter === 'all' || t.accountId === accountFilter;
 
-        return matchesSearch && matchesDate && matchesCategories && matchesType;
+        return matchesSearch && matchesDate && matchesCategories && matchesType && matchesAccount;
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [state.transactions, filter, dateFilter, selectedCategories, typeFilter]);
+  }, [state.transactions, filter, dateFilter, selectedCategories, typeFilter, accountFilter]);
 
   const activeFiltersCount =
-    selectedCategories.length + (typeFilter !== 'all' ? 1 : 0) + (dateFilter ? 1 : 0);
+    selectedCategories.length +
+    (typeFilter !== 'all' ? 1 : 0) +
+    (dateFilter ? 1 : 0) +
+    (accountFilter !== 'all' ? 1 : 0);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev =>
@@ -72,6 +77,7 @@ const TransactionList: React.FC = () => {
     setDateFilter('');
     setSelectedCategories([]);
     setTypeFilter('all');
+    setAccountFilter('all');
   };
 
   return (
@@ -166,6 +172,40 @@ const TransactionList: React.FC = () => {
             </div>
           </div>
 
+          {/* Account Filter */}
+          {state.accounts.length > 1 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Cuenta:</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setAccountFilter('all')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    accountFilter === 'all'
+                      ? 'bg-primary text-white'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  Todas
+                </button>
+                {state.accounts
+                  .filter(a => a.isActive)
+                  .map(account => (
+                    <button
+                      key={account.id}
+                      onClick={() => setAccountFilter(account.id)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        accountFilter === account.id
+                          ? 'bg-primary text-white'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      {account.name}
+                    </button>
+                  ))}
+              </div>
+            </div>
+          )}
+
           {/* Categories Filter */}
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-gray-500 dark:text-gray-400">Categorías:</span>
@@ -227,6 +267,13 @@ const TransactionList: React.FC = () => {
                       </p>
                       <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
                         {transaction.category} &middot; {formatShortDate(transaction.date)}
+                        {transaction.accountId && (
+                          <span className="ml-1">
+                            &middot;{' '}
+                            {state.accounts.find(a => a.id === transaction.accountId)?.name ||
+                              'Cuenta eliminada'}
+                          </span>
+                        )}
                       </p>
                     </div>
                   </div>
