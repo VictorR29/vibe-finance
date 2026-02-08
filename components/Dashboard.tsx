@@ -128,9 +128,10 @@ const Dashboard: React.FC = () => {
     const expense = state.transactions
       .filter(t => t.type === 'expense')
       .reduce((acc, t) => acc + t.amount, 0);
-    const balance = income - expense;
+    // El balance general es la suma real de todos los balances de cuentas
+    const balance = accountBalances.reduce((sum, account) => sum + account.balance, 0);
     return { income, expense, balance };
-  }, [state.transactions]);
+  }, [state.transactions, accountBalances]);
 
   const currencies = [
     { code: 'EUR', label: 'Euro (€)' },
