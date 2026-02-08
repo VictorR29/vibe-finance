@@ -81,25 +81,25 @@ export const SavingsGoalForm: React.FC<SavingsGoalFormProps> = ({ onSubmit, init
         placeholder="Ej: Viaje a Japón"
         required
       />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <FormField
+        label="Cantidad Objetivo"
+        type="number"
+        value={formData.targetAmount}
+        onChange={value => setFormData({ ...formData, targetAmount: value })}
+        error={errors.targetAmount}
+        placeholder="1000"
+        required
+      />
+      {!initialData && (
         <FormField
-          label="Cantidad Objetivo"
-          type="number"
-          value={formData.targetAmount}
-          onChange={value => setFormData({ ...formData, targetAmount: value })}
-          error={errors.targetAmount}
-          placeholder="1000"
-          required
-        />
-        <FormField
-          label="Cantidad Actual"
+          label="Cantidad Inicial (opcional)"
           type="number"
           value={formData.currentAmount}
           onChange={value => setFormData({ ...formData, currentAmount: value })}
           error={errors.currentAmount}
-          placeholder="0"
+          placeholder="0 - Solo al crear la meta"
         />
-      </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           label="Fecha Objetivo"

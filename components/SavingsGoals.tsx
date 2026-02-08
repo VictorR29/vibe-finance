@@ -6,9 +6,10 @@ import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
 import { ConfirmModal } from './ui/ConfirmModal';
 import { SavingsGoalForm } from './SavingsGoalForm';
+import { ContributionForm } from './ContributionForm';
 import { SavingsGoal } from '../types';
 import { formatCurrency, formatDate } from '../utils/format';
-import { Edit, Trash2, PlusCircle, Target } from 'lucide-react';
+import { Edit, Trash2, PlusCircle, Target, PiggyBank } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 const priorityClasses = {
@@ -21,9 +22,12 @@ const SavingsGoalCard: React.FC<{
   goal: SavingsGoal;
   currency: string;
   onEdit: (goal: SavingsGoal) => void;
-  onDelete: (id: string) => void;
-}> = ({ goal, currency, onEdit, onDelete }) => {
+  onContribute: (goal: SavingsGoal) => void;
+  onDelete: (goal: SavingsGoal) => void;
+}> = ({ goal, currency, onEdit, onContribute, onDelete }) => {
   const progress = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
+  const isCompleted = goal.currentAmount >= goal.targetAmount;
+
   return (
     <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow space-y-3">
       <div className="flex justify-between items-start">
@@ -42,23 +46,16 @@ const SavingsGoalCard: React.FC<{
           >
             {goal.priority === 'high' ? 'Alta' : goal.priority === 'medium' ? 'Media' : 'Baja'}
           </span>
-          <Button variant="ghost" size="sm" onClick={() => onEdit(goal)} className="p-1 h-auto">
-            <Edit className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDelete(goal.id)}
-            className="p-1 h-auto text-error"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
         </div>
       </div>
+
       <div className="space-y-1">
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
           <div
-            className="bg-primary h-4 rounded-full text-center text-white text-xs flex items-center justify-center"
+            className={cn(
+              'h-4 rounded-full text-center text-white text-xs flex items-center justify-center transition-all',
+              isCompleted ? 'bg-emerald-500' : 'bg-primary'
+            )}
             style={{ width: `${progress}%` }}
           >
             {Math.round(progress)}%
@@ -69,6 +66,27 @@ const SavingsGoalCard: React.FC<{
           {formatCurrency(goal.targetAmount, currency)}
         </div>
       </div>
+
+      <div className="flex gap-2 pt-2">
+        {!isCompleted && (
+          <Button variant="primary" size="sm" onClick={() => onContribute(goal)} className="flex-1">
+            <PiggyBank className="w-4 h-4 mr-1" />
+            Contribuir
+          </Button>
+        )}
+        <Button variant="secondary" size="sm" onClick={() => onEdit(goal)} className="flex-1">
+          <Edit className="w-4 h-4 mr-1" />
+          Editar
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onDelete(goal)}
+          className="p-2 text-error hover:bg-red-50 dark:hover:bg-red-900/20"
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
     </div>
   );
 };
@@ -77,16 +95,29 @@ const SavingsGoals: React.FC = () => {
   const { state, deleteSavingsGoal } = useAppContext();
   const { showToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isContributeModalOpen, setIsContributeModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
+  const [contributingGoal, setContributingGoal] = useState<SavingsGoal | null>(null);
   const [deletingGoal, setDeletingGoal] = useState<SavingsGoal | null>(null);
 
   const openModal = (goal?: SavingsGoal) => {
     setEditingGoal(goal || null);
     setIsModalOpen(true);
   };
+
   const closeModal = () => {
     setEditingGoal(null);
     setIsModalOpen(false);
+  };
+
+  const openContributeModal = (goal: SavingsGoal) => {
+    setContributingGoal(goal);
+    setIsContributeModalOpen(true);
+  };
+
+  const closeContributeModal = () => {
+    setContributingGoal(null);
+    setIsContributeModalOpen(false);
   };
 
   const handleDeleteGoal = () => {
@@ -116,6 +147,7 @@ const SavingsGoals: React.FC = () => {
                 goal={goal}
                 currency={state.currency}
                 onEdit={openModal}
+                onContribute={openContributeModal}
                 onDelete={() => setDeletingGoal(goal)}
               />
             ))}
@@ -142,6 +174,16 @@ const SavingsGoals: React.FC = () => {
         title={editingGoal ? 'Editar Meta de Ahorro' : 'Nueva Meta de Ahorro'}
       >
         <SavingsGoalForm onSubmit={closeModal} initialData={editingGoal} />
+      </Modal>
+
+      <Modal
+        isOpen={isContributeModalOpen}
+        onClose={closeContributeModal}
+        title="Contribuir a Meta"
+      >
+        {contributingGoal && (
+          <ContributionForm goal={contributingGoal} onSubmit={closeContributeModal} />
+        )}
       </Modal>
 
       <ConfirmModal

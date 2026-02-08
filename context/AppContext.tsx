@@ -20,7 +20,6 @@ const initialCategories = [
   'Salud',
   'Educación',
   'Salario',
-  'Meta de Ahorro',
   'Otros',
 ];
 

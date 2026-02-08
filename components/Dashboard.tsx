@@ -63,7 +63,13 @@ const Dashboard: React.FC = () => {
       const expense = transactions
         .filter(t => t.type === 'expense')
         .reduce((sum, t) => sum + t.amount, 0);
-      const balance = account.initialBalance + income - expense;
+      const transfersOut = transactions
+        .filter(t => t.type === 'transfer')
+        .reduce((sum, t) => sum + t.amount, 0);
+      const transfersIn = state.transactions
+        .filter(t => t.type === 'transfer' && t.toAccountId === account.id)
+        .reduce((sum, t) => sum + t.amount, 0);
+      const balance = account.initialBalance + income - expense - transfersOut + transfersIn;
       return { ...account, balance };
     });
   }, [state.accounts, state.transactions]);
@@ -209,14 +215,20 @@ const Dashboard: React.FC = () => {
         />
         <div
           onClick={() => setShowAccountsModal(true)}
-          className="cursor-pointer hover:opacity-90 transition-opacity"
+          className="cursor-pointer hover:opacity-90 transition-opacity group relative"
+          title="Tu patrimonio total distribuido en todas las cuentas. Las transferencias entre cuentas no afectan este total."
         >
           <CardStat
-            label="Balance Global (Ver desglose)"
+            label="Patrimonio Total (Ver desglose)"
             value={formatCurrency(globalStats.balance, state.currency)}
             icon={<Wallet className="w-6 h-6" />}
             color="bg-primary"
           />
+          <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
+              Incluye todas tus cuentas
+            </div>
+          </div>
         </div>
       </div>
 
