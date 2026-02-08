@@ -204,7 +204,9 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
               value={formData.category}
               onChange={value => setFormData({ ...formData, category: value })}
               error={errors.category}
-              options={state.categories.map(cat => ({ value: cat, label: cat }))}
+              options={state.categories
+                .filter(cat => cat !== 'Meta de Ahorro')
+                .map(cat => ({ value: cat, label: cat }))}
               required
             />
             <FormField

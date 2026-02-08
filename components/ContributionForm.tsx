@@ -11,10 +11,21 @@ interface ContributionFormProps {
 }
 
 export const ContributionForm: React.FC<ContributionFormProps> = ({ goal, onSubmit }) => {
-  const { updateSavingsGoal, state } = useAppContext();
+  const { contributeToGoal, state } = useAppContext();
   const { showToast } = useToast();
   const [amount, setAmount] = useState('');
+  const [selectedAccountId, setSelectedAccountId] = useState('');
   const [error, setError] = useState('');
+
+  // Get active accounts for the selector
+  const activeAccounts = state.accounts.filter(acc => acc.isActive);
+
+  // Set default account on mount
+  React.useEffect(() => {
+    if (activeAccounts.length > 0 && !selectedAccountId) {
+      setSelectedAccountId(activeAccounts[0].id);
+    }
+  }, [activeAccounts, selectedAccountId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,6 +33,11 @@ export const ContributionForm: React.FC<ContributionFormProps> = ({ goal, onSubm
     const contributionAmount = Number(amount);
     if (!amount || isNaN(contributionAmount) || contributionAmount <= 0) {
       setError('Ingresa un monto válido mayor a 0');
+      return;
+    }
+
+    if (!selectedAccountId) {
+      setError('Selecciona una cuenta');
       return;
     }
 
@@ -36,13 +52,11 @@ export const ContributionForm: React.FC<ContributionFormProps> = ({ goal, onSubm
       return;
     }
 
-    // Actualizar la meta (esto automáticamente crea la transacción)
-    updateSavingsGoal({
-      ...goal,
-      currentAmount: newCurrentAmount,
-    });
+    // Usar la nueva función que permite elegir cuenta
+    contributeToGoal(goal.id, contributionAmount, selectedAccountId);
 
-    showToast(`Aporte de ${amount} agregado a "${goal.name}"`, 'success');
+    const accountName = state.accounts.find(a => a.id === selectedAccountId)?.name || 'Cuenta';
+    showToast(`Aporte de ${amount} agregado a "${goal.name}" desde ${accountName}`, 'success');
     setAmount('');
     setError('');
     onSubmit();
@@ -77,6 +91,22 @@ export const ContributionForm: React.FC<ContributionFormProps> = ({ goal, onSubm
         placeholder={`Máximo: ${remainingAmount}`}
         required
         autoFocus
+      />
+
+      <FormField
+        label="Desde cuenta"
+        type="select"
+        value={selectedAccountId}
+        onChange={value => {
+          setSelectedAccountId(value);
+          setError('');
+        }}
+        error={error && !selectedAccountId ? 'Selecciona una cuenta' : ''}
+        options={activeAccounts.map(acc => ({
+          value: acc.id,
+          label: acc.name,
+        }))}
+        required
       />
 
       <div className="flex justify-end pt-4">

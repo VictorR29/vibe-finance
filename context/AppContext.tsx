@@ -154,6 +154,7 @@ interface AppContextType {
   addSavingsGoal: (goal: Omit<SavingsGoal, 'id'>) => void;
   updateSavingsGoal: (goal: SavingsGoal) => void;
   deleteSavingsGoal: (id: string) => void;
+  contributeToGoal: (goalId: string, amount: number, accountId: string) => void;
   addBudget: (budget: Omit<Budget, 'id'>) => void;
   updateBudget: (budget: Budget) => void;
   deleteBudget: (id: string) => void;
@@ -319,6 +320,31 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     [state.savingsGoals, state.accounts]
   );
 
+  const contributeToGoal = useCallback(
+    (goalId: string, amount: number, accountId: string) => {
+      const goal = state.savingsGoals.find(g => g.id === goalId);
+      if (!goal) return;
+
+      // Create transaction for the contribution
+      const transaction: Omit<Transaction, 'id'> = {
+        amount: amount,
+        category: 'Meta de Ahorro',
+        description: `Aporte a meta: ${goal.name}`,
+        date: new Date().toISOString().split('T')[0],
+        type: 'expense',
+        accountId: accountId,
+      };
+      dispatch({ type: 'ADD_TRANSACTION', payload: { ...transaction, id: generateId() } });
+
+      // Update the goal
+      dispatch({
+        type: 'UPDATE_SAVINGS_GOAL',
+        payload: { ...goal, currentAmount: goal.currentAmount + amount },
+      });
+    },
+    [state.savingsGoals]
+  );
+
   const deleteSavingsGoal = useCallback((id: string) => {
     dispatch({ type: 'DELETE_SAVINGS_GOAL', payload: id });
   }, []);
@@ -369,6 +395,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       addSavingsGoal,
       updateSavingsGoal,
       deleteSavingsGoal,
+      contributeToGoal,
       addBudget,
       updateBudget,
       deleteBudget,
@@ -390,6 +417,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       addSavingsGoal,
       updateSavingsGoal,
       deleteSavingsGoal,
+      contributeToGoal,
       addBudget,
       updateBudget,
       deleteBudget,
