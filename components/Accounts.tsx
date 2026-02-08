@@ -67,6 +67,7 @@ const Accounts: React.FC = () => {
     const account = state.accounts.find(a => a.id === accountId);
     if (!account) return 0;
 
+    // Transacciones donde esta cuenta es la origen
     const transactions = state.transactions.filter(t => t.accountId === accountId);
     const income = transactions
       .filter(t => t.type === 'income')
@@ -74,8 +75,16 @@ const Accounts: React.FC = () => {
     const expenses = transactions
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + t.amount, 0);
+    const transfersOut = transactions
+      .filter(t => t.type === 'transfer')
+      .reduce((sum, t) => sum + t.amount, 0);
 
-    return account.initialBalance + income - expenses;
+    // Transferencias entrantes (donde esta cuenta es el destino)
+    const transfersIn = state.transactions
+      .filter(t => t.type === 'transfer' && t.toAccountId === accountId)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    return account.initialBalance + income - expenses - transfersOut + transfersIn;
   };
 
   const getAccountTransactionsCount = (accountId: string): number => {
@@ -218,7 +227,7 @@ const Accounts: React.FC = () => {
                     >
                       <Edit2 className="w-4 h-4" />
                     </Button>
-                    {state.accounts.length > 1 && (
+                    {state.accounts.length > 1 && account.id !== 'default' && (
                       <Button
                         variant="ghost"
                         size="sm"

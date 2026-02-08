@@ -95,13 +95,20 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case 'LOAD_DATA': {
       // Migration: ensure accounts array exists and calculate real balance
       let migratedAccounts = action.payload.accounts;
+
+      // Migration: assign accountId to old transactions without it
+      let migratedTransactions = action.payload.transactions || [];
+      migratedTransactions = migratedTransactions.map((t: Transaction) => ({
+        ...t,
+        accountId: t.accountId || 'default',
+      }));
+
       if (!migratedAccounts || migratedAccounts.length === 0) {
         // Calculate current balance from existing transactions
-        const transactions = action.payload.transactions || [];
-        const income = transactions
+        const income = migratedTransactions
           .filter((t: Transaction) => t.type === 'income')
           .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
-        const expenses = transactions
+        const expenses = migratedTransactions
           .filter((t: Transaction) => t.type === 'expense')
           .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
         const currentBalance = income - expenses;
@@ -117,6 +124,7 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       const migratedState = {
         ...action.payload,
         accounts: migratedAccounts,
+        transactions: migratedTransactions,
       };
       return migratedState;
     }
@@ -173,6 +181,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
           if (!mergedState.categories || mergedState.categories.length === 0) {
             mergedState.categories = initialCategories;
           }
+          // Migration: assign accountId to old transactions without it
+          if (mergedState.transactions) {
+            mergedState.transactions = mergedState.transactions.map((t: Transaction) => ({
+              ...t,
+              accountId: t.accountId || 'default',
+            }));
+          }
+
           // Migration: ensure accounts array exists with real balance
           if (!mergedState.accounts || mergedState.accounts.length === 0) {
             const transactions = mergedState.transactions || [];
