@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Card } from './ui/Card';
 import { formatCurrency, formatShortDate } from '../utils/format';
+import { useIsMobile } from '../hooks/useMediaQuery';
 import {
   TrendingUp,
   TrendingDown,
@@ -41,8 +42,52 @@ interface MonthlyComparison {
   expenseChange: number;
 }
 
+// Función para agrupar datos por semana
+const groupByWeek = (data: TrendData[]): TrendData[] => {
+  if (data.length === 0) return [];
+
+  const weeks: TrendData[] = [];
+  let currentWeek: TrendData | null = null;
+  let weekStart: Date | null = null;
+
+  data.forEach((day, index) => {
+    const date = new Date(day.date);
+    const dayOfWeek = date.getDay(); // 0 = Domingo, 1 = Lunes
+
+    // Si es el primer día o es domingo, iniciar nueva semana
+    if (index === 0 || dayOfWeek === 0) {
+      if (currentWeek) {
+        weeks.push(currentWeek);
+      }
+      currentWeek = {
+        date: day.date,
+        income: day.income,
+        expense: day.expense,
+        balance: day.balance,
+      };
+      weekStart = new Date(day.date);
+    } else {
+      // Acumular en la semana actual
+      if (currentWeek) {
+        currentWeek.income += day.income;
+        currentWeek.expense += day.expense;
+        // Para balance, tomamos el último valor del día
+        currentWeek.balance = day.balance;
+      }
+    }
+  });
+
+  // Agregar la última semana
+  if (currentWeek) {
+    weeks.push(currentWeek);
+  }
+
+  return weeks;
+};
+
 const Trends: React.FC = () => {
   const { state } = useAppContext();
+  const isMobile = useIsMobile();
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('15d');
 
   const getDaysForPeriod = (period: Period): number => {
@@ -110,8 +155,13 @@ const Trends: React.FC = () => {
         };
       });
 
+    // Agrupar por semana en mobile para períodos largos
+    if (isMobile && ['3m', '6m', '1y'].includes(selectedPeriod)) {
+      return groupByWeek(data);
+    }
+
     return data;
-  }, [state.transactions, selectedPeriod]);
+  }, [state.transactions, selectedPeriod, isMobile]);
 
   const monthlyComparison = useMemo(() => {
     const months: Record<string, { income: number; expense: number }> = {};
@@ -152,6 +202,13 @@ const Trends: React.FC = () => {
 
   const formatXAxis = (dateStr: string) => {
     const date = new Date(dateStr);
+    // En mobile con datos agrupados por semana, mostrar "Sem X"
+    if (isMobile && ['3m', '6m', '1y'].includes(selectedPeriod)) {
+      const startOfYear = new Date(date.getFullYear(), 0, 1);
+      const diff = date.getTime() - startOfYear.getTime();
+      const weekNum = Math.floor(diff / (7 * 24 * 60 * 60 * 1000)) + 1;
+      return `S${weekNum}`;
+    }
     return `${date.getDate()}/${date.getMonth() + 1}`;
   };
 
