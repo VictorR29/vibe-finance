@@ -2,7 +2,14 @@ import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Card } from './ui/Card';
 import { formatCurrency, formatShortDate } from '../utils/format';
-import { TrendingUp, TrendingDown, Calendar, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import {
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  ArrowUpRight,
+  ArrowDownRight,
+  Info,
+} from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -16,7 +23,7 @@ import {
 } from 'recharts';
 import { cn } from '../utils/cn';
 
-type Period = '30d' | '3m' | '6m' | '1y';
+type Period = '15d' | '30d' | '3m' | '6m' | '1y';
 
 interface TrendData {
   date: string;
@@ -36,10 +43,12 @@ interface MonthlyComparison {
 
 const Trends: React.FC = () => {
   const { state } = useAppContext();
-  const [selectedPeriod, setSelectedPeriod] = useState<Period>('6m');
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>('15d');
 
   const getDaysForPeriod = (period: Period): number => {
     switch (period) {
+      case '15d':
+        return 15;
       case '30d':
         return 30;
       case '3m':
@@ -49,7 +58,7 @@ const Trends: React.FC = () => {
       case '1y':
         return 365;
       default:
-        return 180;
+        return 15;
     }
   };
 
@@ -161,7 +170,7 @@ const Trends: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tendencias</h1>
         <div className="flex gap-2">
-          {(['30d', '3m', '6m', '1y'] as Period[]).map(period => (
+          {(['15d', '30d', '3m', '6m', '1y'] as Period[]).map(period => (
             <button
               key={period}
               onClick={() => setSelectedPeriod(period)}
@@ -172,6 +181,7 @@ const Trends: React.FC = () => {
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
               )}
             >
+              {period === '15d' && '15 días'}
               {period === '30d' && '30 días'}
               {period === '3m' && '3 meses'}
               {period === '6m' && '6 meses'}
@@ -216,7 +226,17 @@ const Trends: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Balance Neto</p>
+              <div className="flex items-center gap-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400">Balance Neto</p>
+                <div className="group relative">
+                  <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 w-64 text-center">
+                    Flujo del período seleccionado. No incluye acumulado previo ni balances
+                    iniciales.
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                  </div>
+                </div>
+              </div>
               <p
                 className={cn(
                   'text-2xl font-bold',
