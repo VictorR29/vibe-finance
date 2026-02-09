@@ -169,7 +169,7 @@ const Trends: React.FC = () => {
     <div className="space-y-6 pb-20 md:pb-0">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tendencias</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {(['15d', '30d', '3m', '6m', '1y'] as Period[]).map(period => (
             <button
               key={period}

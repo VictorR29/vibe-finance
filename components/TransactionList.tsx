@@ -147,7 +147,7 @@ const TransactionList: React.FC = () => {
           {/* Type Filter */}
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-gray-500 dark:text-gray-400">Tipo:</span>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setTypeFilter('all')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -195,7 +195,7 @@ const TransactionList: React.FC = () => {
           {state.accounts.length > 1 && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">Cuenta:</span>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setAccountFilter('all')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${

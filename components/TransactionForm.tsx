@@ -98,7 +98,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Type Selection */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-4">
         {(['expense', 'income', 'transfer'] as const).map(type => (
           <button
             key={type}
