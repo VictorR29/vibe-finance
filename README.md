@@ -21,10 +21,13 @@
 
 ### ✨ Características Principales
 
-- 📊 **Dashboard Intuitivo**: Visualiza tus finanzas con gráficos y estadísticas claras
-- 💳 **Registro de Transacciones**: Controla ingresos y gastos con categorías personalizables
-- 🎯 **Metas de Ahorro**: Establece objetivos financieros y sigue tu progreso
+- 📊 **Dashboard Intuitivo**: Visualiza tu patrimonio total y finanzas con gráficos claros
+- 💳 **Gestión Multi-Cuenta**: Crea múltiples cuentas (efectivo, banco, ahorros) con transferencias entre ellas
+- 🎯 **Metas de Ahorro Inteligentes**: Establece objetivos y contribuye desde cualquier cuenta
 - 💵 **Presupuestos Mensuales**: Administra tus límites de gasto por categoría
+- 🔄 **Transferencias**: Mueve dinero entre cuentas sin afectar tu patrimonio total
+- 📊 **Tendencias Detalladas**: Análisis de 15 días (predeterminado) hasta 1 año
+- 💱 **Sincronización de Moneda**: La cuenta principal sigue automáticamente tu moneda global
 - 📱 **PWA Instalable**: Instálala en tu móvil o desktop como una app nativa
 - 🌙 **Modo Oscuro/Claro**: Interfaz adaptable a tu preferencia
 - 💾 **Datos Persistentes**: Toda la información se guarda localmente en tu dispositivo
@@ -36,6 +39,26 @@
 **👉 [https://vibe-finance-psi.vercel.app](https://vibe-finance-psi.vercel.app)**
 
 Prueba la aplicación directamente en tu navegador. Puedes instalarla en tu dispositivo para usarla offline.
+
+### 💡 Cómo Funciona
+
+**Patrimonio Total vs Balance Neto:**
+
+- **Patrimonio Total**: Tu riqueza real (suma de todas las cuentas + balances iniciales + transferencias)
+- **Balance Neto** (en Tendencias): Flujo de ingresos - gastos del período seleccionado
+
+**Sistema de Metas de Ahorro:**
+
+1. Crea una meta con objetivo y fecha límite
+2. Usa el botón "Contribuir" para aportar desde cualquier cuenta
+3. Las contribuciones se registran automáticamente como gastos
+4. Visualiza tu progreso en tiempo real
+
+**Gestión Multi-Cuenta:**
+
+- Crea cuentas para diferentes propósitos (efectivo, banco, inversiones)
+- La cuenta "General" está protegida y sincronizada con tu moneda global
+- Realiza transferencias entre cuentas sin afectar tu patrimonio total
 
 ### 📸 Capturas de Pantalla
 
@@ -82,14 +105,17 @@ Los archivos optimizados se generarán en la carpeta `dist/`.
 ### 📱 Instalación como PWA
 
 **En Android (Chrome):**
+
 1. Visita la app en Chrome
 2. Toca el menú (⋮) → "Agregar a pantalla de inicio"
 
 **En iOS (Safari):**
+
 1. Visita la app en Safari
 2. Toca Compartir → "Agregar a Inicio"
 
 **En Desktop (Chrome/Edge):**
+
 1. Visita la app
 2. Aparecerá el ícono de instalación en la barra de direcciones
 3. Click → "Instalar Vibe Finance"
