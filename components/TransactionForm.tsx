@@ -178,7 +178,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit, init
             />
           </div>
           <FormField
-            label="Descripción (opcional)"
+            label="Descripción"
             type="text"
             value={formData.description}
             onChange={value => setFormData({ ...formData, description: value })}
