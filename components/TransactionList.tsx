@@ -62,7 +62,10 @@ const TransactionList: React.FC = () => {
         const matchesCategories =
           selectedCategories.length === 0 || selectedCategories.includes(t.category);
         const matchesType = typeFilter === 'all' || t.type === typeFilter;
-        const matchesAccount = accountFilter === 'all' || t.accountId === accountFilter;
+        const matchesAccount =
+          accountFilter === 'all' ||
+          t.accountId === accountFilter ||
+          (t.type === 'transfer' && t.toAccountId === accountFilter);
 
         return matchesSearch && matchesDate && matchesCategories && matchesType && matchesAccount;
       })

@@ -130,10 +130,11 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case 'SET_THEME':
       return { ...state, theme: action.payload };
     case 'SET_CURRENCY': {
-      // Sincronizar la moneda de la cuenta default con la moneda global
-      const updatedAccounts = state.accounts.map(account =>
-        account.id === 'default' ? { ...account, currency: action.payload } : account
-      );
+      // Sincronizar la moneda de TODAS las cuentas con la moneda global
+      const updatedAccounts = state.accounts.map(account => ({
+        ...account,
+        currency: action.payload,
+      }));
       return { ...state, currency: action.payload, accounts: updatedAccounts };
     }
     default:
