@@ -223,7 +223,7 @@ const Accounts: React.FC = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => openModal(account)}
-                      className="p-1 h-auto text-gray-500 hover:text-primary"
+                      className="p-1 h-auto min-w-[44px] min-h-[44px] text-gray-500 hover:text-primary flex items-center justify-center"
                     >
                       <Edit2 className="w-4 h-4" />
                     </Button>
@@ -232,7 +232,7 @@ const Accounts: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => setDeletingAccount(account)}
-                        className="p-1 h-auto text-gray-500 hover:text-error"
+                        className="p-1 h-auto min-w-[44px] min-h-[44px] text-gray-500 hover:text-error flex items-center justify-center"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>

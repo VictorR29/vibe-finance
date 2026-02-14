@@ -30,7 +30,7 @@ export const FormField: React.FC<FormFieldProps> = props => {
   const { label, error } = props;
 
   const baseInputClasses =
-    'block w-full px-3 py-2 border border-neutral-300 rounded-md shadow-sm placeholder-neutral-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-white dark:bg-neutral-700 dark:border-neutral-600 dark:text-white dark:placeholder-neutral-400';
+    'block w-full px-3 py-2 min-h-[44px] border border-neutral-300 rounded-md shadow-sm placeholder-neutral-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-white dark:bg-neutral-700 dark:border-neutral-600 dark:text-white dark:placeholder-neutral-400';
   const errorClasses = 'border-error focus:ring-error focus:border-error';
 
   const renderInput = () => {

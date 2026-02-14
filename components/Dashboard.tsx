@@ -350,7 +350,7 @@ const Dashboard: React.FC = () => {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card title="Top Gastos (Histórico)" className="lg:col-span-2 min-h-[400px]">
-          <div className="h-[300px] w-full mt-4 min-w-0">
+          <div className="h-[250px] md:h-[300px] w-full mt-4 min-w-0">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={expenseByCategory}

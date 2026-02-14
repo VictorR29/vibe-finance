@@ -135,7 +135,9 @@ const MainApp: React.FC = () => {
         onClick={() => setActiveView(view)}
         className={cn(
           'flex items-center transition-all duration-300 group',
-          mobile ? 'flex-col justify-center p-2 rounded-xl' : 'w-full px-4 py-3 rounded-xl mb-1',
+          mobile
+            ? 'flex-col justify-center p-2 rounded-xl min-h-[44px]'
+            : 'w-full px-4 py-3 rounded-xl mb-1',
           isActive
             ? mobile
               ? 'text-primary'

@@ -67,7 +67,7 @@ const SavingsGoalCard: React.FC<{
         </div>
       </div>
 
-      <div className="flex gap-2 pt-2">
+      <div className="flex flex-wrap gap-2 pt-2">
         {!isCompleted && (
           <Button variant="primary" size="sm" onClick={() => onContribute(goal)} className="flex-1">
             <PiggyBank className="w-4 h-4 mr-1" />

@@ -312,7 +312,7 @@ const Trends: React.FC = () => {
 
       {/* Main Chart */}
       <Card title="Evolución Financiera">
-        <div className="h-[400px]">
+        <div className="h-[300px] md:h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={trendData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
@@ -372,7 +372,7 @@ const Trends: React.FC = () => {
 
       {/* Balance Chart */}
       <Card title="Balance Acumulado">
-        <div className="h-[300px]">
+        <div className="h-[250px] md:h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={trendData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.3} />

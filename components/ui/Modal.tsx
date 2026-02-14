@@ -40,7 +40,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex min-h-screen items-center justify-center p-4 text-center">
+      <div className="flex min-h-screen items-center justify-center p-2 md:p-4 text-center">
         {/* Backdrop */}
         <div
           className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
@@ -56,7 +56,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
           )}
         >
           {title && (
-            <div className="flex items-center justify-between p-6 border-b border-gray-200/50 dark:border-gray-700/50">
+            <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200/50 dark:border-gray-700/50">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h3>
               <button
                 onClick={onClose}
@@ -66,7 +66,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
               </button>
             </div>
           )}
-          <div className="p-6">{children}</div>
+          <div className="p-4 md:p-6 max-h-[70vh] overflow-y-auto">{children}</div>
         </div>
       </div>
     </div>

@@ -68,14 +68,19 @@ const BudgetCard: React.FC<{
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => onEdit(budget)} className="p-1 h-auto">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onEdit(budget)}
+            className="p-1 h-auto min-w-[44px] min-h-[44px] flex items-center justify-center"
+          >
             <Edit className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => onDelete(budget.id)}
-            className="p-1 h-auto text-error"
+            className="p-1 h-auto min-w-[44px] min-h-[44px] text-error flex items-center justify-center"
           >
             <Trash2 className="w-4 h-4" />
           </Button>
