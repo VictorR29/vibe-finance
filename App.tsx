@@ -123,17 +123,22 @@ const MainApp: React.FC = () => {
     icon,
     label,
     mobile = false,
+    mobileOnlyIcon = false,
   }: {
     view: View;
     icon: React.ReactElement<any>;
     label: string;
     mobile?: boolean;
+    mobileOnlyIcon?: boolean;
   }) => {
     const isActive = activeView === view;
-    return (
-      <button
-        onClick={() => setActiveView(view)}
-        className={cn(
+    
+    // For mobile icon-only mode, adjust sizing and remove text
+    const iconSize = mobileOnlyIcon ? 'w-5 h-5' : mobile ? 'w-6 h-6' : 'w-6 h-6 mr-3';
+    const labelClass = mobileOnlyIcon ? 'hidden' : cn('font-medium', mobile ? 'text-[10px] mt-1' : 'text-sm');
+    const buttonClass = mobileOnlyIcon 
+      ? 'p-1 rounded-full transition-all duration-200'
+      : cn(
           'flex items-center transition-all duration-300 group',
           mobile
             ? 'flex-col justify-center p-2 rounded-xl min-h-[44px]'
@@ -143,21 +148,33 @@ const MainApp: React.FC = () => {
               ? 'text-primary'
               : 'bg-primary text-white shadow-lg shadow-primary/30'
             : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
+        );
+
+    return (
+      <button
+        onClick={() => setActiveView(view)}
+        className={cn(
+          buttonClass,
+          isActive && mobile && !mobileOnlyIcon ? 'bg-primary text-white shadow-lg shadow-primary/30' : ''
         )}
       >
         <div
           className={cn(
             'transition-transform duration-200',
-            isActive && mobile ? '-translate-y-1' : ''
+            isActive && mobile && !mobileOnlyIcon ? '-translate-y-1' : ''
           )}
         >
           {React.cloneElement(icon, {
-            className: cn('w-6 h-6', mobile ? '' : 'mr-3'),
+            className: cn(iconSize, mobileOnlyIcon ? '' : mobile ? '' : 'mr-3'),
           })}
         </div>
-        <span className={cn('font-medium', mobile ? 'text-[10px] mt-1' : 'text-sm')}>{label}</span>
-        {mobile && isActive && (
-          <div className="absolute bottom-0 w-1 h-1 bg-primary rounded-full mb-1"></div>
+        {!mobileOnlyIcon && (
+          <>
+            <span className={labelClass}>{label}</span>
+            {mobile && isActive && (
+              <div className="absolute bottom-0 w-1 h-1 bg-primary rounded-full mb-1"></div>
+            )}
+          </>
         )}
       </button>
     );
@@ -234,15 +251,16 @@ const MainApp: React.FC = () => {
           <div className="max-w-7xl mx-auto min-h-[calc(100vh-8rem)]">{renderContent()}</div>
         </div>
 
-        {/* Mobile Bottom Navigation (Glassmorphism) */}
+        {/* Mobile Bottom Navigation (Glassmorphism - Icons Only) */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 pb-safe">
-          <div className="flex justify-around items-center h-16 px-2">
-            <NavItem view="dashboard" icon={<LayoutDashboard />} label="Inicio" mobile />
-            <NavItem view="transactions" icon={<Wallet />} label="Transacc." mobile />
-            <NavItem view="savingsGoals" icon={<Target />} label="Metas" mobile />
-            <NavItem view="budgets" icon={<Shield />} label="Presup." mobile />
-            <NavItem view="accounts" icon={<Landmark />} label="Cuentas" mobile />
-            <NavItem view="trends" icon={<TrendingUp />} label="Tendencias" mobile />
+          <div className="flex justify-center items-center h-12 px-3 space-x-4">
+            <NavItem view="dashboard" icon={<LayoutDashboard />} label="" mobileOnlyIcon />
+            <NavItem view="transactions" icon={<Wallet />} label="" mobileOnlyIcon />
+            <NavItem view="savingsGoals" icon={<Target />} label="" mobileOnlyIcon />
+            <NavItem view="budgets" icon={<Shield />} label="" mobileOnlyIcon />
+            <NavItem view="accounts" icon={<Landmark />} label="" mobileOnlyIcon />
+            <NavItem view="trends" icon={<TrendingUp />} label="" mobileOnlyIcon />
+            <NavItem view="settings" icon={<SettingsIcon />} label="" mobileOnlyIcon />
           </div>
         </nav>
       </main>
